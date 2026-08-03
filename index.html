@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang=en class=no-js><link rel=stylesheet href=3DGridContentPreview-main.dc616efc.css><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1"><title>AJ Glover Design</title><meta name=description content="A grid layout with content preview and a magnetic effect."><meta name=keywords content="gsap, 3d, grid, thumbnails, content, preview, front end, css, javascript"><meta name=author content=Codrops><link rel=icon type=image/png href=favicon.10d87be7.png><link rel=stylesheet href=https://use.typekit.net/gyf5muf.css><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Jacquard+12&amp;display=swap" rel=stylesheet><link rel=stylesheet href=3DGridContentPreview-main.6b5973f3.css><script>document.documentElement.className="js";var supportsCssVars=function(){var e,t=document.createElement("style");return t.innerHTML="root: { --tmp-var: bold; }",document.head.appendChild(t),e=!!(window.CSS&&window.CSS.supports&&window.CSS.supports("font-weight","var(--tmp-var)")),t.parentNode.removeChild(t),e};supportsCssVars()||alert("Please view this demo in a modern browser that supports CSS Variables.");</script><body class=loading>
+<!DOCTYPE html><html lang=en class=no-js><link rel=stylesheet href=3DGridContentPreview-main.dc616efc.css><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1"><title>AJ Glover Design</title><meta name=description content="A grid layout with content preview and a magnetic effect."><meta name=keywords content="gsap, 3d, grid, thumbnails, content, preview, front end, css, javascript"><meta name=author content=Codrops><link rel=icon type=image/png href=favicon.10d87be7.png><link rel=stylesheet href=https://use.typekit.net/gyf5muf.css><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Jacquard+12&amp;display=swap" rel=stylesheet><link rel=stylesheet href=3DGridContentPreview-main.305a74d7.css><script>document.documentElement.className="js";var supportsCssVars=function(){var e,t=document.createElement("style");return t.innerHTML="root: { --tmp-var: bold; }",document.head.appendChild(t),e=!!(window.CSS&&window.CSS.supports&&window.CSS.supports("font-weight","var(--tmp-var)")),t.parentNode.removeChild(t),e};supportsCssVars()||alert("Please view this demo in a modern browser that supports CSS Variables.");</script><body class=loading>
 		<canvas class=site-background></canvas>
 		<main>
 			<div class=message>Please view this demo on a desktop to see the effect.</div>
@@ -544,10 +544,10 @@
                                     <img src=before-2.b836b2f4.png alt="before 2">
                                     <img src=christmas-garland.efc014a6.png alt="christmas garland">
                                     <img src=heal-images.af3826ff.png alt="heal images">
-                                    <img src=heal-postcard.b778f0ad.png alt="heal postcard">
+                                    <img src=heal-postcard.60bc8005.png alt="heal postcard">
                                     <img src=nawco-1.508804c8.png alt="nawco 1">
                                     <img src=nawco-2.b48331b9.png alt="nawco 2">
-                                    <img src=nawco-mockup.69722ff3.jpg alt="nawco mockup">
+                                    <img src=nawco-mockup.4df0b8b3.jpg alt="nawco mockup">
                                     <img src=sample-1.ca9b292e.png alt="sample 1">
                                     <img src=sample-2.cf1859de.jpg alt="sample 2">
                                     <img src=sample-3.3ff00203.jpg alt="sample 3">
@@ -559,10 +559,12 @@
 					</div>
 				</div>
 			</div>
+		<div class=lightbox id=lightbox onclick="this.classList.remove('open')"><img src=data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7 id=lightbox-img alt></div>
 		</main>
 		<div class=cursor>
 			<svg width=80 height=80 class=cursor__svg viewBox="0 0 80 80"><circle cx=40 cy=40 r=20 class=cursor__svg-circle vector-effect=non-scaling-stroke /></svg>
 			<span class=cursor__text></span>
 		</div>
 		<script type=text/javascript src=3DGridContentPreview-main.c4734e90.js></script>
+	<script>document.addEventListener("click",function(e){if(e.target.matches(".preview__item-gallery-items img")){var t=document.getElementById("lightbox");document.getElementById("lightbox-img").src=e.target.src,t.classList.add("open")}});</script>
 	
