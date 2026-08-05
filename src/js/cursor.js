@@ -1,4 +1,3 @@
-import { gsap } from 'gsap';
 import { lerp, getMousePos } from './utils';
 
 // Track the mouse position

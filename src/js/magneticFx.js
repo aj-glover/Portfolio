@@ -1,4 +1,3 @@
-import gsap from 'gsap';
 import { lerp, getMousePos, calcWinsize, getTranslateValues } from './utils';
 
 // Calculate the viewport size

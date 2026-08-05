@@ -1,4 +1,3 @@
-import { gsap } from 'gsap';
 import { map, lerp, getMousePos, calcWinsize, getRandomNumber } from './utils';
 import { MagneticFx }  from './magneticFx';
 import { Preview }  from './preview';
@@ -12,32 +11,32 @@ let mousepos = {x: winsize.width/2, y: winsize.height/2};
 window.addEventListener('mousemove', ev => mousepos = getMousePos(ev));
 
 export class GridItem {
-    constructor(el) {
+    constructor(el, contentEl) {
         this.DOM = {el: el};
-        // the inner image
         this.DOM.image = this.DOM.el.querySelector('.grid__item-img');
-        // the title that will appear next to the mouse cursor when hovering
+        this.DOM.contentEl = contentEl;
         this.title = this.DOM.el.dataset.title;
-        // amounts to move in each axis when moving the cursor
         this.translationVals = {x: 0, y: 0};
         this.rotationVals = {x: 0, y: 0};
-        // get random start and end translation/rotation boundaries
-        // translation:
         this.xstart = getRandomNumber(70,100);
         this.ystart = getRandomNumber(40,65);
-        // rotation:
         this.rxstart = 5;
         this.rystart = 10;
-        // magnetic effect on the image:
-        // when hovering on the image, the image will follow the mouse movement
         this.magneticFx = new MagneticFx(this.DOM.image);
-        // the content/preview element
-        this.DOM.contentEl = document.querySelector(this.DOM.el.href.substring(this.DOM.el.href.lastIndexOf('#')));
-        this.preview = new Preview(this.DOM.contentEl);
-        // initial style/position
+        this.preview = null;
         this.layout();
-        // start the rAF render function (translate and rotate the item as we move the mouse)
         this.loopTransformAnimation();
+    }
+
+    initPreview(grid) {
+        if (this.preview) {
+            return;
+        }
+
+        this.preview = new Preview(this.DOM.contentEl);
+        this.preview.DOM.backCtrl.addEventListener('click', () => {
+            grid.hideContent(this);
+        });
     }
     // initial position on the grid
     // set the rotation and the translationZ

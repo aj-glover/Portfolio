@@ -1,34 +1,26 @@
-import { gsap } from 'gsap';
-import { EventEmitter } from 'events';
+// Use global `gsap` loaded via CDN and a local EventEmitter polyfill
+import { EventEmitter } from './events-polyfill.js';
 import { GridItem } from './gridItem';
 import { getRandomNumber } from './utils';
 
-import 'splitting/dist/splitting.css';
-import 'splitting/dist/splitting-cells.css';
-import Splitting from 'splitting';
-
-// initialize Splitting
-const splitting = Splitting();
-
-
-// title behind the grid
-const title = document.querySelector('.content__title');
-// Splitting will run on the inner spans
-// get the chars
-const titleChars = [...title.querySelectorAll('.char')];
-
+// Splitting is loaded via CDN and exposes global `Splitting`
 
 export class Grid extends EventEmitter {
     constructor(el) {
         super();
         this.DOM = {el: el};
+        this.title = document.querySelector('.content__title');
+        Splitting();
+        this.titleChars = [...this.title.querySelectorAll('.char')];
 
-        this.gridItems = [];
+        const previewMap = Array.from(document.querySelectorAll('.preview__item')).reduce((map, preview) => {
+            map[`#${preview.id}`] = preview;
+            return map;
+        }, {});
+
         this.DOM.items = [...this.DOM.el.querySelectorAll('.grid__item')];
-        this.DOM.items.forEach(item => {
-            this.gridItems.push(new GridItem(item));
-        });
-        
+        this.gridItems = this.DOM.items.map(item => new GridItem(item, previewMap[item.getAttribute('href')]));
+
         this.showItems();
         this.initEvents();
     }
@@ -67,15 +59,15 @@ export class Grid extends EventEmitter {
                 ev.preventDefault();
                 this.showContent(item);
             });
-
-            item.preview.DOM.backCtrl.addEventListener('click', ev => {
-                this.hideContent(item);
-            });
         }
     }
     showContent(item) {
         if ( this.isContentOpen ) {
             return false;
+        }
+
+        if ( !item.preview ) {
+            item.initPreview(this);
         }
 
         this.isContentOpen = true;
@@ -101,7 +93,7 @@ export class Grid extends EventEmitter {
             y: '-='+getRandomNumber(1000,1600),
             stagger: {amount: 0.2, grid: 'auto', from: 'top'}
         }, 'start')
-        .to(titleChars, {
+        .to(this.titleChars, {
             duration: 1.5,
             ease: 'expo.inOut',
             opacity: 0,
@@ -120,17 +112,11 @@ export class Grid extends EventEmitter {
             y: '0%',
             stagger: 0.05
         }, 'start+=0.6')
-        .to([item.preview.DOM.imgWrap, item.preview.DOM.image], {
-            duration: 1.5,
-            ease: 'expo.inOut',
-            opacity: 1,
-            y: '0%',
-            rotationX: 0
-        }, 'start+=0.5')
-        .to(item.preview.DOM.imgWrap, {
-            duration: 1.5,
-            ease: 'expo.inOut',
-            opacity: 1
+        .add(() => {
+            if (item.preview.DOM.imgWrap) {
+                gsap.to(item.preview.DOM.imgWrap, {duration: 1.5, ease: 'expo.inOut', opacity: 1, y: '0%', rotationX: 0});
+                gsap.to(item.preview.DOM.image, {duration: 1.5, ease: 'expo.inOut', opacity: 1, y: '0%', rotationX: 0});
+            }
         }, 'start+=0.5')
         .to(item.preview.DOM.backCtrl, {
             duration: 1.5,
@@ -170,16 +156,11 @@ export class Grid extends EventEmitter {
             y: '100%',
             stagger: -0.04
         }, 'start')
-        .to(item.preview.DOM.imgWrap, {
-            duration: 1.5,
-            ease: 'expo.inOut',
-            y: '100%',
-            rotationX: -20
-        }, 'start')
-        .to(item.preview.DOM.image, {
-            duration: 1.5,
-            ease: 'expo.inOut',
-            y: '-100%'
+        .add(() => {
+            if (item.preview.DOM.imgWrap) {
+                gsap.to(item.preview.DOM.imgWrap, {duration: 1.5, ease: 'expo.inOut', y: '100%', rotationX: -20});
+                gsap.to(item.preview.DOM.image, {duration: 1.5, ease: 'expo.inOut', y: '-100%'});
+            }
         }, 'start')
         .to(item.preview.DOM.backCtrl, {
             duration: 1.5,
@@ -194,7 +175,7 @@ export class Grid extends EventEmitter {
             opacity: 0
         }, 'start')
 
-        .to(titleChars, {
+        .to(this.titleChars, {
             duration: 1,
             ease: 'expo.inOut',
             opacity: 1,

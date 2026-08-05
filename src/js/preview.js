@@ -1,4 +1,4 @@
-import { gsap } from 'gsap';
+// Using global `gsap` loaded from CDN
 
 export class Preview {
     constructor(el) {
@@ -8,7 +8,7 @@ export class Preview {
         this.DOM.backCtrl = this.DOM.el.querySelector('.preview__item-back');
         // image elements (outer and inner)
         this.DOM.imgWrap = this.DOM.el.querySelector('.preview__item-imgwrap');
-        this.DOM.image = this.DOM.imgWrap.querySelector('.preview__item-img');
+        this.DOM.image = this.DOM.imgWrap ? this.DOM.imgWrap.querySelector('.preview__item-img') : null;
         // gallery thumbnails
         this.DOM.galleryItems = [...this.DOM.el.querySelectorAll('.preview__item-gallery-items img')];
         // title
@@ -32,8 +32,10 @@ export class Preview {
         gsap.set(this.DOM.titleChars, {opacity: 0, y: '100%'});
 
         // hide image element
-        gsap.set(this.DOM.imgWrap, {y: '100%', rotationX: -20});
-        gsap.set(this.DOM.image, {y: '-100%'});
+        if (this.DOM.imgWrap) {
+            gsap.set(this.DOM.imgWrap, {y: '100%', rotationX: -20});
+            gsap.set(this.DOM.image, {y: '-100%'});
+        }
 
         // hide back ctrl
         gsap.set(this.DOM.backCtrl, {opacity: 0});
@@ -47,7 +49,9 @@ export class Preview {
         this.DOM.galleryItems.forEach(img => {
             img.addEventListener('click', () => {
                 const src = img.getAttribute('src');
-                this.DOM.image.style.backgroundImage = `url(${src})`;
+                if (this.DOM.image) {
+                    this.DOM.image.style.backgroundImage = `url(${src})`;
+                }
                 this.DOM.galleryItems.forEach(item => item.classList.remove('preview__item-gallery-item--active'));
                 img.classList.add('preview__item-gallery-item--active');
             });
