@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cmd /c \"cd /d C:\\\\Users\\\\AJ\\\\Downloads\\\\3DGridContentPreview-main\\\\3DGridContentPreview-main && dir src\\\\img\\\\thumbs\\\\ux-0x0ss-2\\.png /b\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

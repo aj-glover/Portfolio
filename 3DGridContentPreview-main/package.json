@@ -1,0 +1,39 @@
+{
+  "name": "3DGridContentPreview",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "parcel src/index.html --open",
+    "clean": "node -e \"try{require('fs').rmSync('dist',{recursive:true,force:true})}catch(e){}\"",
+    "build:parcel": "parcel build src/index.html --public-url ./",
+    "fix-paths": "node fix-paths.js",
+    "sync-galleries": "node sync-galleries.js",
+    "copy-to-full": "node copy-to-full.js",
+    "optimize-images": "node optimize-images.js",
+    "build": "npm run clean && npm run optimize-images && npm run copy-to-full && npm run sync-galleries && npm run build:parcel && npm run fix-paths",
+    "predeploy": "npm run build",
+    "deploy": "npx gh-pages -d dist --dotfiles"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aj-glover/Portfolio.git"
+  },
+  "keywords": [],
+  "author": "Codrops",
+  "license": "MIT",
+  "homepage": "https://aj-glover.github.io/Portfolio",
+  "bugs": {
+    "url": "https://github.com/codrops/3DGridContentPreview/issues"
+  },
+  "dependencies": {
+    "gsap": "^3.6.1",
+    "imagesloaded": "^4.1.4",
+    "parcel": "latest",
+    "splitting": "^1.0.6"
+  },
+  "devDependencies": {
+    "events": "^3.3.0",
+    "gh-pages": "^6.3.0",
+    "sharp": "^0.35.3"
+  }
+}

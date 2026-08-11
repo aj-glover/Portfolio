@@ -1,0 +1,142 @@
+/**
+ * src/styles/ambient.css - DOM chrome for the ambient space layer.
+ *
+ * Requirement #20: every element here is decorative. All are pointer-events:none
+ * and aria-hidden, so none of them can interfere with text selection, links,
+ * buttons, forms, scrolling or keyboard navigation.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Shared base                                                         */
+/* ------------------------------------------------------------------ */
+
+.ambient-hint,
+.ambient-transmission,
+.ambient-anomaly {
+    position: fixed;
+    pointer-events: none;
+    user-select: none;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0;
+    z-index: 10000;
+}
+
+/* ------------------------------------------------------------------ */
+/* LMB — FIRE hint (requirement #16)                                   */
+/* ------------------------------------------------------------------ */
+
+.ambient-hint {
+    /* Sits clear of the existing EXPLORATION readout at bottom-centre so the
+       hint never collides with real HUD information. */
+    bottom: 96px;
+    left: 50%;
+    transform: translate(-50%, 8px);
+
+    font-size: 10px;
+    color: rgba(150, 210, 255, 0.75);
+    background: rgba(6, 12, 24, 0.55);
+    border: 1px solid rgba(120, 190, 255, 0.18);
+    border-radius: 3px;
+    padding: 6px 12px;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.ambient-hint.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* ------------------------------------------------------------------ */
+/* SIGNAL DETECTED transmission (requirement #10)                      */
+/* ------------------------------------------------------------------ */
+
+.ambient-transmission {
+    top: 22%;
+    right: 40px;
+    font-size: 9px;
+    color: rgba(130, 230, 200, 0.7);
+    transform: translateX(6px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.ambient-transmission::before {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin-right: 7px;
+    border-radius: 50%;
+    background: rgba(130, 230, 200, 0.85);
+    vertical-align: middle;
+}
+
+.ambient-transmission.is-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ------------------------------------------------------------------ */
+/* System anomaly (requirement #12)                                    */
+/* ------------------------------------------------------------------ */
+
+.ambient-anomaly {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: flex-start;
+    font-size: 10px;
+    line-height: 1.5;
+    color: rgba(190, 220, 255, 0.82);
+    background: rgba(4, 8, 18, 0.72);
+    border: 1px solid rgba(120, 190, 255, 0.2);
+    border-radius: 2px;
+    padding: 12px 18px;
+    /* No transition in: the appearance should be instantaneous.
+       The fade-out is what keeps it from feeling like a broken UI. */
+    transition: opacity 0.12s linear;
+}
+
+.ambient-anomaly.is-visible {
+    opacity: 1;
+}
+
+.ambient-anomaly__title {
+    font-size: 9px;
+    color: rgba(150, 210, 255, 0.55);
+}
+
+.ambient-anomaly__rule {
+    width: 100%;
+    height: 1px;
+    background: rgba(120, 190, 255, 0.25);
+    margin: 2px 0 4px;
+}
+
+.ambient-anomaly__line {
+    font-size: 10px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reduced motion (requirement #21)                                    */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+    /* The anomaly and transmission are suppressed in JS via the capability
+       profile; this is a belt-and-braces guard in case either is ever
+       triggered manually. */
+    .ambient-anomaly,
+    .ambient-transmission {
+        display: none !important;
+    }
+
+    .ambient-hint {
+        transition: opacity 0.3s ease;
+        transform: translate(-50%, 0);
+    }
+}

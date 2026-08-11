@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+3DGridContentPreview-main/node_modules/
+
+# Cache
+.cache/
+.parcel-cache/
+3DGridContentPreview-main/.cache/
+3DGridContentPreview-main/.parcel-cache/
+
+# Lock files
+package-lock.json
+
+# Logs
+server.log
+*.log
+
+# Test results
+test-results/
+audit-screenshots/
+
+# Build output
+dist/
+3DGridContentPreview-main/dist/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,458 @@
+{
+  "timestamp": "2026-08-10T20:18:46.459Z",
+  "consoleErrors": [
+    {
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  Canvas has an existing context of a different type",
+      "url": "http://localhost:3002/node_modules/.vite/deps/three.module-BEvS_7fE.js?v=d3ba6ba3"
+    },
+    {
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  Canvas has an existing context of a different type",
+      "url": "http://localhost:3002/node_modules/.vite/deps/three.module-BEvS_7fE.js?v=d3ba6ba3"
+    },
+    {
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  Canvas has an existing context of a different type",
+      "url": "http://localhost:3002/node_modules/.vite/deps/three.module-BEvS_7fE.js?v=d3ba6ba3"
+    },
+    {
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  Canvas has an existing context of a different type",
+      "url": "http://localhost:3002/node_modules/.vite/deps/three.module-BEvS_7fE.js?v=d3ba6ba3"
+    }
+  ],
+  "consoleWarnings": [
+    {
+      "text": "THREE.DRACOLoader: setDecoderConfig to has been deprecated and will be removed in r194.",
+      "url": "http://localhost:3002/node_modules/.vite/deps/three_examples_jsm_loaders_DRACOLoader__js.js?v=10eb28f5"
+    },
+    {
+      "text": "THREE.DRACOLoader: setDecoderConfig to has been deprecated and will be removed in r194.",
+      "url": "http://localhost:3002/node_modules/.vite/deps/three_examples_jsm_loaders_DRACOLoader__js.js?v=10eb28f5"
+    },
+    {
+      "text": "[.WebGL-0x3ce4001b2000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "url": "http://localhost:3002/"
+    },
+    {
+      "text": "THREE.DRACOLoader: setDecoderConfig to has been deprecated and will be removed in r194.",
+      "url": "http://localhost:3002/node_modules/.vite/deps/three_examples_jsm_loaders_DRACOLoader__js.js?v=10eb28f5"
+    },
+    {
+      "text": "[.WebGL-0x3ce4001b2000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "url": "http://localhost:3002/"
+    },
+    {
+      "text": "[.WebGL-0x3ce4001b2000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "url": "http://localhost:3002/"
+    },
+    {
+      "text": "[.WebGL-0x3ce4001b2000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
+      "url": "http://localhost:3002/"
+    },
+    {
+      "text": "Deprecated API for given entry type.",
+      "url": "unknown"
+    }
+  ],
+  "networkFailures": [],
+  "performanceMetrics": {
+    "initialLoadTime": 4876,
+    "domContentLoaded": 276,
+    "loadComplete": 641,
+    "fcp": 964,
+    "lcp": null,
+    "domInteractive": 18,
+    "topAssets": [
+      {
+        "name": "cursor.glb",
+        "size": 88568,
+        "type": "fetch"
+      },
+      {
+        "name": "01.png",
+        "size": 19777,
+        "type": "img"
+      },
+      {
+        "name": "019fde7b-4d3f-70f4-b687-6ac367eaa9db.glb",
+        "size": 14510,
+        "type": "fetch"
+      },
+      {
+        "name": "01.jpeg",
+        "size": 13809,
+        "type": "img"
+      },
+      {
+        "name": "01.jpeg",
+        "size": 9728,
+        "type": "img"
+      },
+      {
+        "name": "01.jpg",
+        "size": 9649,
+        "type": "img"
+      },
+      {
+        "name": "019fde80-6581-7e7e-879f-eee203bf0e65.glb",
+        "size": 8792,
+        "type": "fetch"
+      },
+      {
+        "name": "019fde80-3c0a-71e0-bf8e-ebe4141c9272.glb",
+        "size": 8098,
+        "type": "fetch"
+      },
+      {
+        "name": "019fde95-ca3b-743f-bd61-a3377b36ec5f.glb",
+        "size": 7230,
+        "type": "fetch"
+      },
+      {
+        "name": "019fde7f-e903-73d5-97ff-ed94cdcacd2e.glb",
+        "size": 6388,
+        "type": "fetch"
+      },
+      {
+        "name": "three.module-BEvS_7fE.js?v=d3ba6ba3",
+        "size": 5751,
+        "type": "script"
+      },
+      {
+        "name": "01.jpg",
+        "size": 3431,
+        "type": "img"
+      },
+      {
+        "name": "01.jpg",
+        "size": 2635,
+        "type": "img"
+      },
+      {
+        "name": "01.jpg",
+        "size": 2474,
+        "type": "img"
+      },
+      {
+        "name": "01.jpeg",
+        "size": 1196,
+        "type": "img"
+      },
+      {
+        "name": "gsap.js?v=131d80d4",
+        "size": 613,
+        "type": "script"
+      },
+      {
+        "name": "01.jpeg",
+        "size": 490,
+        "type": "img"
+      },
+      {
+        "name": "three_examples_jsm_loaders_GLTFLoader__js.js?v=336945a4",
+        "size": 405,
+        "type": "script"
+      },
+      {
+        "name": "gsap_ScrollTrigger.js?v=9969a366",
+        "size": 367,
+        "type": "script"
+      },
+      {
+        "name": "cursor.js",
+        "size": 238,
+        "type": "script"
+      }
+    ]
+  },
+  "viewportIssues": {
+    "desktop-1440": {
+      "overflow": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "hasOverflow": false
+      },
+      "bodyRect": {
+        "width": 1440,
+        "height": 900
+      },
+      "issues": []
+    },
+    "desktop-1280": {
+      "overflow": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "hasOverflow": false
+      },
+      "bodyRect": {
+        "width": 1280,
+        "height": 800
+      },
+      "issues": []
+    },
+    "tablet-1024": {
+      "overflow": {
+        "scrollWidth": 1024,
+        "clientWidth": 1024,
+        "hasOverflow": false
+      },
+      "bodyRect": {
+        "width": 1024,
+        "height": 768
+      },
+      "issues": []
+    },
+    "tablet-portrait": {
+      "overflow": {
+        "scrollWidth": 768,
+        "clientWidth": 768,
+        "hasOverflow": false
+      },
+      "bodyRect": {
+        "width": 768,
+        "height": 1024
+      },
+      "issues": []
+    },
+    "mobile-390": {
+      "overflow": {
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "hasOverflow": false
+      },
+      "bodyRect": {
+        "width": 390,
+        "height": 844
+      },
+      "issues": []
+    },
+    "mobile-375": {
+      "overflow": {
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "hasOverflow": false
+      },
+      "bodyRect": {
+        "width": 375,
+        "height": 812
+      },
+      "issues": []
+    }
+  },
+  "interactionResults": {
+    "hud": {
+      "hasAJGlover": true,
+      "hasSector": true,
+      "hasObjects": true,
+      "hasMap": true
+    },
+    "cursor": {
+      "exists": true,
+      "zIndex": "9999",
+      "pointerEvents": "none",
+      "display": "block"
+    },
+    "tooltip": {
+      "exists": false
+    },
+    "targeting": {
+      "exists": false
+    },
+    "categoryView": {
+      "exists": true,
+      "display": "none",
+      "title": ""
+    },
+    "caseStudy": {
+      "exists": true,
+      "display": "none",
+      "title": ""
+    },
+    "aboutView": {
+      "exists": true,
+      "display": "none",
+      "hasForm": true,
+      "hasAstronaut": false
+    },
+    "contactForm": {
+      "exists": true,
+      "action": "https://formspree.io/f/xqpzplde",
+      "method": "post",
+      "fields": {
+        "name": {
+          "exists": true,
+          "type": "text",
+          "required": true
+        },
+        "email": {
+          "exists": true,
+          "type": "email",
+          "required": true
+        },
+        "subject": {
+          "exists": true,
+          "type": "select-one",
+          "required": true
+        },
+        "message": {
+          "exists": true,
+          "type": "textarea",
+          "required": true
+        }
+      }
+    },
+    "externalLinks": [
+      {
+        "href": "https://www.linkedin.com/in/gloveraj/",
+        "text": "inLinkedIn",
+        "hasRel": "noopener noreferrer",
+        "hasNoopener": true,
+        "hasNoreferrer": true
+      },
+      {
+        "href": "https://aj-glover.github.io/",
+        "text": "↗Portfolio",
+        "hasRel": "noopener noreferrer",
+        "hasNoopener": true,
+        "hasNoreferrer": true
+      },
+      {
+        "href": "http://localhost:3002/Anthony_Glover_Marketing_Resume.pdf",
+        "text": "↓Resume",
+        "hasRel": "noopener noreferrer",
+        "hasNoopener": true,
+        "hasNoreferrer": true
+      }
+    ],
+    "webgl": {
+      "totalCanvases": 2,
+      "webglCanvases": []
+    }
+  },
+  "accessibilityIssues": {
+    "imagesWithoutAlt": 0,
+    "buttonsWithoutLabel": 0,
+    "inputsWithoutLabel": 0,
+    "headingLevels": [
+      1,
+      1,
+      2,
+      1,
+      2,
+      2,
+      2,
+      2,
+      3,
+      3,
+      3,
+      3,
+      3,
+      2,
+      2,
+      2
+    ],
+    "issues": []
+  },
+  "seoIssues": [
+    {
+      "check": "title",
+      "value": "Universe Portfolio",
+      "status": "pass"
+    },
+    {
+      "check": "meta-description",
+      "value": null,
+      "status": "fail"
+    },
+    {
+      "check": "h1",
+      "value": [
+        "AJ",
+        "",
+        "I connect creativity, technology, and growth."
+      ],
+      "status": "pass"
+    },
+    {
+      "check": "favicon",
+      "value": null,
+      "status": "fail"
+    },
+    {
+      "check": "og-tags",
+      "value": {},
+      "status": "fail"
+    },
+    {
+      "check": "html-lang",
+      "value": "en",
+      "status": "pass"
+    }
+  ],
+  "visualIssues": [],
+  "screenshots": [
+    {
+      "name": "01-init-sequence",
+      "filename": "01-init-sequence.png",
+      "fullPage": false
+    },
+    {
+      "name": "02-universe-view",
+      "filename": "02-universe-view.png",
+      "fullPage": false
+    },
+    {
+      "name": "03-universe-stabilized",
+      "filename": "03-universe-stabilized.png",
+      "fullPage": true
+    },
+    {
+      "name": "04-hover-center",
+      "filename": "04-hover-center.png",
+      "fullPage": false
+    },
+    {
+      "name": "05-after-planet-click",
+      "filename": "05-after-planet-click.png",
+      "fullPage": false
+    },
+    {
+      "name": "06-after-return",
+      "filename": "06-after-return.png",
+      "fullPage": false
+    },
+    {
+      "name": "07-about-attempt",
+      "filename": "07-about-attempt.png",
+      "fullPage": false
+    },
+    {
+      "name": "responsive-desktop-1440",
+      "filename": "responsive-desktop-1440.png",
+      "fullPage": false
+    },
+    {
+      "name": "responsive-desktop-1280",
+      "filename": "responsive-desktop-1280.png",
+      "fullPage": false
+    },
+    {
+      "name": "responsive-tablet-1024",
+      "filename": "responsive-tablet-1024.png",
+      "fullPage": false
+    },
+    {
+      "name": "responsive-tablet-portrait",
+      "filename": "responsive-tablet-portrait.png",
+      "fullPage": false
+    },
+    {
+      "name": "responsive-mobile-390",
+      "filename": "responsive-mobile-390.png",
+      "fullPage": false
+    },
+    {
+      "name": "responsive-mobile-375",
+      "filename": "responsive-mobile-375.png",
+      "fullPage": false
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+/* Global reset and base styles for the Universe Portfolio */
+
+body {
+    margin: 0;
+    overflow: hidden; /* Essential for immersive, full-screen canvas experience */
+    /* Deep-space nebula backdrop shown through the transparent 3D canvas */
+    background: radial-gradient(ellipse at 50% 40%, #0a0a2e 0%, #00000a 55%, #000000 100%);
+    background-color: #00000a;
+}
+
+/* The Three.js renderer canvas must be a full-viewport fixed layer so it's
+   always visible above the body background and below UI overlays. */
+body > canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 0;
+    display: block;
+}
+
+#root {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+/* Styles for elements that overlay the 3D scene (UI) */
+.ui-overlay {
+    position: absolute;
+    z-index: 10; /* Must be above canvas */
+    pointer-events: none; /* By default, let mouse events pass through to canvas/cursor unless specifically targeted */
+}
+
+/* Placeholder for loading state */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #00000a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}

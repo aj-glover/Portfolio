@@ -1,0 +1,41 @@
+/* Planet hover tooltip - follows cursor, HUD-style */
+
+.planet-tooltip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.5rem 0.85rem;
+    background: rgba(5, 8, 20, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: #fff;
+    font-family: sans-serif;
+    pointer-events: none;
+    z-index: 900;
+    --planet-accent: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transform-origin: center center;
+    will-change: transform, opacity, left, top;
+    max-width: 240px;
+}
+
+.planet-tooltip-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: var(--planet-accent);
+    text-shadow: 0 0 12px var(--planet-accent);
+}
+
+.planet-tooltip-description {
+    font-size: 0.7rem;
+    opacity: 0.75;
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+}

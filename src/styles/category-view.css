@@ -1,0 +1,108 @@
+/* Category view overlay styles - HUD-style, non-blocking */
+
+.category-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    background: transparent;
+    color: #fff;
+    font-family: sans-serif;
+    z-index: 850;
+    padding: 0;
+    pointer-events: none;
+    --category-accent: #ffffff;
+}
+
+/* Compact header bar at the top, capped at 12vh so it cannot reach the
+   mid-screen card band. Overflow hidden ensures no accidental spillover. */
+.category-view-content {
+    max-width: 100%;
+    width: 100%;
+    max-height: 12vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    background: rgba(5, 8, 20, 0.35);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.category-view-title {
+    font-size: 1.3rem;
+    margin: 0;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--category-accent);
+    text-shadow: 0 0 20px var(--category-accent);
+}
+
+.category-view-description {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: 0.03em;
+    max-width: 90vw;
+}
+
+.category-view-hint {
+    font-size: 0.65rem;
+    opacity: 0.5;
+    font-style: italic;
+    margin: 0;
+    letter-spacing: 0.05em;
+    max-width: 90vw;
+}
+
+.category-view-back {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 1.6rem;
+    font-size: 0.85rem;
+    background: rgba(5, 8, 20, 0.55);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+    z-index: 860;
+}
+
+.category-view-back:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+    transform: translateX(-50%) translateY(-2px);
+}
+
+/* Responsive tweaks for shorter viewports */
+@media (max-height: 600px) {
+    .category-view-content {
+        max-height: 14vh;
+        padding: 0.3rem 0.75rem;
+    }
+    .category-view-title {
+        font-size: 1.1rem;
+    }
+    .category-view-description {
+        font-size: 0.65rem;
+    }
+    .category-view-hint {
+        display: none;
+    }
+}
