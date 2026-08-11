@@ -23,6 +23,10 @@ audit-screenshots/
 dist/
 3DGridContentPreview-main/dist/
 
+# Disabled git folders
+.git_disabled/
+3DGridContentPreview-main/.git_disabled/
+
 # OS files
 .DS_Store
 Thumbs.db
