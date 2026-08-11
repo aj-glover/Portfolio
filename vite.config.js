@@ -8,6 +8,7 @@ import path from 'path';
 
 export default defineConfig({
   root: './', // Assuming we are running vite from the root directory of 3DGridContentPreview-main
+  base: '/Portfolio/', // GitHub Pages base path for aj-glover.github.io/Portfolio
   build: {
     outDir: path.resolve(__dirname, 'dist'),
     emptyOutDir: true, // Clears previous build output
