@@ -249,7 +249,7 @@ const loadModel = () => {
 
     return new Promise((resolve) => {
         loader.load(
-            resolveAsset('/models/cursor.glb'),
+            resolveAsset('models/cursor.glb'),
             (gltf) => {
                 modelGroup = gltf.scene;
                 modelGroup.name = 'cursor-model';
