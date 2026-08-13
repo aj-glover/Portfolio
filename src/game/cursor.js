@@ -25,6 +25,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import gameState from '../systems/gameState.js';
+import { resolveAsset } from '../utils/paths.js';
 import ambient from './ambient/index.js';
 
 // ============================================================================
@@ -248,7 +249,7 @@ const loadModel = () => {
 
     return new Promise((resolve) => {
         loader.load(
-            '/models/cursor.glb',
+            resolveAsset('/models/cursor.glb'),
             (gltf) => {
                 modelGroup = gltf.scene;
                 modelGroup.name = 'cursor-model';
