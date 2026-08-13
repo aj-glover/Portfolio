@@ -511,20 +511,16 @@ const render = () => {
             angularVelocity = 0;
         }
 
-        // Lock orientation to the ship's true nose direction and apply a proper
-        // spacecraft transform rather than a generic 2D spin. This is the part that
-        // was still making the model feel like it was rotating on a single axis.
-        const yawQuat = new Quaternion().setFromEuler(new Euler(0, 0, currentHeading + Math.PI, 'XYZ'));
-        const pitchQuat = new Quaternion().setFromEuler(new Euler(-currentSmoothedPitch, 0, 0, 'XYZ'));
-        const bankQuat = new Quaternion().setFromEuler(new Euler(0, currentSmoothedRoll, 0, 'XYZ'));
-
-        targetQuat.copy(yawQuat)
-            .multiply(bankQuat)
-            .multiply(pitchQuat);
-
-        // Preserve the original model tilt so it still reads as a top-down craft.
-        const baseTilt = new Quaternion().setFromEuler(new Euler(baseRotationX, 0, 0, 'XYZ'));
-        targetQuat.premultiply(baseTilt);
+        // Restore the craft to its original visible top-down frame and keep the
+        // turn constrained to the ship's own heading instead of a free-floating spin.
+        const limitedBank = currentSmoothedRoll * 0.5;
+        targetEuler.set(
+            baseRotationX + currentSmoothedPitch,
+            limitedBank,
+            currentHeading + Math.PI,
+            'XYZ'
+        );
+        targetQuat.setFromEuler(targetEuler);
 
         // Shortest-path: if target is in the opposite hemisphere, negate it
         // so slerp never takes the long way around (>180 deg).
