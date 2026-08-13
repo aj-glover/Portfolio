@@ -1,6 +1,7 @@
 /**
  * Loading Screen Manager
- * Handles the loading screen display and progress bar updates
+ * Handles the loading screen display and real progress tracking
+ * Monitors actual resource loading: scripts, stylesheets, images, and models
  */
 
 class LoadingManager {
@@ -10,7 +11,14 @@ class LoadingManager {
         this.progressText = null;
         this.loadingScreen = null;
         this.isComplete = false;
+        
+        // Resource tracking
+        this.resourcesStarted = 0;
+        this.resourcesCompleted = 0;
+        this.estimatedTotal = 0;
+        
         this.init();
+        this.trackResourceLoading();
     }
 
     init() {
@@ -23,8 +31,81 @@ class LoadingManager {
             return;
         }
 
-        // Start with a small progress value to show something is happening
-        this.setProgress(5);
+        // Start with initial progress
+        this.setProgress(8);
+    }
+
+    /**
+     * Track real resource loading events
+     */
+    trackResourceLoading() {
+        // Monitor network activity via performance API
+        const observer = new PerformanceObserver((list) => {
+            const entries = list.getEntries();
+            entries.forEach((entry) => {
+                // Track XHR, fetch, script, style, image, and other resources
+                if (entry.initiatorType && 
+                    (entry.initiatorType.includes('script') ||
+                     entry.initiatorType.includes('link') ||
+                     entry.initiatorType.includes('img') ||
+                     entry.initiatorType === 'fetch' ||
+                     entry.initiatorType === 'xmlhttprequest')) {
+                    
+                    this.resourcesCompleted++;
+                    this.updateProgressFromResources();
+                }
+            });
+        });
+
+        try {
+            observer.observe({ entryTypes: ['resource'] });
+        } catch (e) {
+            console.log('[Loading] Resource timing not available, using fallback progress');
+            // Fallback: simulate progress if observer not available
+            this.simulateFallbackProgress();
+        }
+
+        // Monitor page readiness
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.setProgress(75);
+            });
+            window.addEventListener('load', () => {
+                this.setProgress(95);
+            });
+        } else {
+            this.setProgress(60);
+            window.addEventListener('load', () => {
+                this.setProgress(95);
+            });
+        }
+    }
+
+    /**
+     * Update progress based on tracked resources
+     */
+    updateProgressFromResources() {
+        // Map resource completion to progress: 8% -> 80%
+        const resourceProgress = 8 + (Math.min(this.resourcesCompleted, 50) / 50) * 72;
+        if (resourceProgress > this.progress) {
+            this.setProgress(Math.floor(resourceProgress));
+        }
+    }
+
+    /**
+     * Fallback progress simulation if resource timing unavailable
+     */
+    simulateFallbackProgress() {
+        let current = this.progress;
+        const interval = setInterval(() => {
+            const increment = Math.random() * (85 - current) * 0.05;
+            current += increment;
+            if (current >= 75) {
+                clearInterval(interval);
+                return;
+            }
+            this.setProgress(Math.floor(current));
+        }, 400);
     }
 
     /**
@@ -33,16 +114,21 @@ class LoadingManager {
      */
     setProgress(percent) {
         percent = Math.min(Math.max(percent, 0), 100);
-        this.progress = percent;
+        // Only update if progress increases
+        if (percent > this.progress) {
+            this.progress = percent;
 
-        if (this.progressBar) {
-            this.progressBar.style.width = percent + '%';
-        }
-        if (this.progressText) {
-            this.progressText.textContent = Math.round(percent) + '%';
-        }
+            if (this.progressBar) {
+                this.progressBar.style.width = percent + '%';
+            }
+            if (this.progressText) {
+                this.progressText.textContent = Math.round(percent) + '%';
+            }
 
-        console.log(`[Loading] ${Math.round(percent)}%`);
+            if (percent % 10 === 0 || percent === 100) {
+                console.log(`[Loading] ${Math.round(percent)}%`);
+            }
+        }
     }
 
     /**
@@ -77,21 +163,6 @@ class LoadingManager {
 
         console.log('[Loading] Complete');
     }
-
-    /**
-     * Simulate loading progress for demo/placeholder
-     */
-    simulateProgress() {
-        let current = this.progress;
-        const interval = setInterval(() => {
-            current += Math.random() * 15;
-            if (current >= 90) {
-                clearInterval(interval);
-                current = 90;
-            }
-            this.setProgress(current);
-        }, 500);
-    }
 }
 
 // Export for use
@@ -105,3 +176,12 @@ if (document.readyState === 'loading') {
 } else {
     window.loadingManager = new LoadingManager();
 }
+
+// Auto-complete loading when page fully loads
+window.addEventListener('load', () => {
+    if (window.loadingManager && !window.loadingManager.isComplete) {
+        setTimeout(() => {
+            window.loadingManager.complete();
+        }, 500);
+    }
+});

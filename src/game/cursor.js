@@ -241,7 +241,8 @@ const loadModel = () => {
     console.log('[Cursor] Loading 3D cursor model...');
 
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+    // Use local Draco decoder for faster loading (no external network request)
+    dracoLoader.setDecoderPath(resolveAsset('/libs/draco/'));
 
     const loader = new GLTFLoader();
     loader.setDRACOLoader(dracoLoader);
