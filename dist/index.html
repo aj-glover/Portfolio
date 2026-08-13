@@ -23,33 +23,20 @@
     <meta name="twitter:description" content="Explore the creative universe of AJ Glover — marketing strategy, UX/UI design, video production, growth marketing, and photography.">
 
   <link rel="stylesheet" crossorigin href="/Portfolio/index.css">
-  <link rel="stylesheet" crossorigin href="/Portfolio/loading.css">
-  <script src="/Portfolio/loading.js"></script>
+  <script src="/Portfolio/performance-monitor.js"></script>
   <script type="module" crossorigin src="/Portfolio/index.js"></script>
+  <script>
+    // Register service worker for offline support and caching
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/Portfolio/sw.js')
+        .then(reg => console.log('[ServiceWorker] Registered'))
+        .catch(err => console.log('[ServiceWorker] Registration failed:', err));
+    }
+  </script>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loading-screen">
-        <div class="loading-container">
-            <div class="loading-content">
-                <h1 class="loading-title">AJ Glover</h1>
-                <p class="loading-subtitle">Creative Universe Loading...</p>
-                
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div id="progress-fill" class="progress-fill"></div>
-                    </div>
-                    <div class="progress-text-wrapper">
-                        <span id="progress-text" class="progress-text">0%</span>
-                    </div>
-                </div>
-                
-                <p class="loading-message">Initializing 3D environment...</p>
-            </div>
-        </div>
-    </div>
-
     <!-- Main App Root -->
     <div id="root"></div>
+  </script>
 </body>
 </html>
