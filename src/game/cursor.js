@@ -82,7 +82,7 @@ const targetQuat = new Quaternion();
 const targetEuler = new Euler(0, 0, 0, 'XYZ');
 
 /** Rotation responsiveness (higher = snappier). Used as 1 - exp(-k * dt). */
-const ROTATION_RESPONSE = 12;
+const ROTATION_RESPONSE = 5.5;
 
 /** Target pitch (X rotation offset from base) for mouse up/down */
 let targetPitch = 0;
@@ -131,12 +131,12 @@ const idlePhaseRock = Math.random() * Math.PI * 2;
 const PHYSICS = {
     deadZone: 50,
     maxSpeed: 800,
-    stiffness: 4.0,
-    damping: 2.5,
-    maxBank: 1.0,
-    maxPitch: 0.4,
-    rollResponse: 0.55,
-    rollSmooth: 0.18,
+    stiffness: 2.8,
+    damping: 1.8,
+    maxBank: 0.7,
+    maxPitch: 0.28,
+    rollResponse: 0.38,
+    rollSmooth: 0.12,
 };
 
 const REDUCED_PHYSICS = {
@@ -480,7 +480,7 @@ const render = () => {
             const physics = getPhysics();
 
             // Pitch smoothing
-            currentSmoothedPitch += (targetPitch - currentSmoothedPitch) * 0.15;
+            currentSmoothedPitch += (targetPitch - currentSmoothedPitch) * 0.09;
 
             // Roll / bank from turn rate + lateral drift
             const headingDelta = Math.atan2(
@@ -497,6 +497,8 @@ const render = () => {
 
             let targetRoll = -angularVelocity * physics.rollResponse;
             targetRoll -= lateralVel * 0.0025;
+            // Keep the bank limited and coherent with the forward motion rather than
+            // allowing a floating, free-rotation feel from mixed Euler axes.
             if (targetRoll > physics.maxBank) targetRoll = physics.maxBank;
             if (targetRoll < -physics.maxBank) targetRoll = -physics.maxBank;
 
@@ -509,15 +511,22 @@ const render = () => {
             angularVelocity = 0;
         }
 
-        // Build target orientation as a quaternion, then slerp toward it.
-        // Yaw on Z (top-down) so the nose tracks the mouse on screen.
-        targetEuler.set(
-            baseRotationX + currentSmoothedPitch,
-            currentSmoothedRoll,
-            currentHeading + Math.PI,
-            'XYZ'
-        );
-        targetQuat.setFromEuler(targetEuler);
+        // Build the ship orientation in quaternion space from its actual flight
+        // vector rather than mixing arbitrary Euler axes. This keeps the ship nose-
+        // led and prevents the free-floating, single-axis drift.
+        const shipForward = new Vector3(Math.cos(currentHeading), Math.sin(currentHeading), 0).normalize();
+        const modelForward = new Vector3(0, 1, 0);
+        const headingQuat = new Quaternion().setFromUnitVectors(modelForward, shipForward);
+
+        const pitchQuat = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -currentSmoothedPitch);
+        const bankQuat = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), currentSmoothedRoll);
+
+        targetQuat.copy(headingQuat).multiply(pitchQuat).multiply(bankQuat);
+
+        // Keep the base model tilt so the ship reads as a proper spacecraft even when
+        // the pointer is centered.
+        const baseTilt = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), baseRotationX);
+        targetQuat.multiply(baseTilt);
 
         // Shortest-path: if target is in the opposite hemisphere, negate it
         // so slerp never takes the long way around (>180 deg).
