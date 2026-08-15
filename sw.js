@@ -1,12 +1,12 @@
 /**
  * Service Worker for Portfolio
  * Caches assets for offline support and faster repeat visits
- * Version 2.0 - Optimized caching strategy
+ * Version 2.1 - Cache bump to remove map button from old bundle
  */
 
-const CACHE_NAME = 'portfolio-cache-v2';
-const RUNTIME_CACHE = 'portfolio-runtime-v2';
-const IMAGE_CACHE = 'portfolio-images-v2';
+const CACHE_NAME = 'portfolio-cache-v3';
+const RUNTIME_CACHE = 'portfolio-runtime-v3';
+const IMAGE_CACHE = 'portfolio-images-v3';
 
 // Assets to cache immediately on install
 const STATIC_ASSETS = [
