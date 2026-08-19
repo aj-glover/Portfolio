@@ -18,7 +18,8 @@
 
 import {
     Scene, OrthographicCamera, WebGLRenderer, AmbientLight, DirectionalLight,
-    Group, Box3, Vector3, Mesh, IcosahedronGeometry, MeshStandardMaterial
+    Group, Box3, Vector3, Mesh, IcosahedronGeometry, MeshStandardMaterial,
+    Quaternion, Euler
 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
@@ -89,6 +90,13 @@ let previousHeading = 0;
 /** Angular velocity for rotation inertia */
 let angularVelocity = 0;
 
+// Reused scratch objects for composing the model's final orientation each
+// frame (see the yaw/pitch/roll block in render()) - avoids per-frame GC.
+const _attitudeEuler = new Euler();
+const _attitudeQuat = new Quaternion();
+const _yawQuat = new Quaternion();
+const _yawAxis = new Vector3(0, 0, 1);
+
 /** Whether the cursor is visible */
 let visible = false;
 
@@ -119,17 +127,18 @@ const idlePhaseRock = Math.random() * Math.PI * 2;
 // ============================================================================
 
 const PHYSICS = {
-    maxSpeed: 900,           // max ship speed in orthographic px/s
-    stiffness: 140,          // spring constant pulling ship toward the mouse target
-    damping: 21,             // velocity damping (~0.85 damping ratio at this stiffness - minimal overshoot)
+    maxSpeed: 1100,          // hard cap on ship speed in orthographic px/s
+    catchUpRate: 7,          // desired speed = distance-to-target * this (px/s per px), capped at maxSpeed
+    acceleration: 15,        // 1/s rate at which velocity chases the desired velocity (higher = snappier)
     edgeMargin: 40,          // px kept clear around the viewport edge
-    settleDistance: 0.4,     // px - snap to target when this close and slow
-    settleSpeed: 4,          // px/s - snap to target when slower than this
-    headingSpeedThreshold: 18, // px/s - below this, hold last heading instead of re-aiming
-    maxBank: 1.0,            // maximum roll/bank angle (radians) when turning
-    maxPitch: 0.4,           // maximum pitch angle (radians) - from vertical movement
-    rollResponse: 0.55,      // how strongly turn rate maps into roll
-    rollSmooth: 0.18,        // roll interpolation factor (higher = snappier bank)
+    settleDistance: 0.5,     // px - snap to target when this close and slow
+    settleSpeed: 3,          // px/s - snap to target when slower than this
+    headingSpeedThreshold: 12, // px/s - below this, hold last heading instead of re-aiming
+    maxBank: 0.3,            // maximum roll/bank angle (radians, ~17°) - kept small so the flat
+                              // delta-wing mesh never rolls edge-on to the top-down camera
+    maxPitch: 0.15,          // maximum pitch angle (radians, ~8.5°) - subtle nose dip/rise
+    rollResponse: 0.4,       // how strongly turn rate maps into roll
+    rollSmooth: 0.22,        // roll interpolation factor (higher = snappier bank)
 };
 
 // Reduced-motion overrides
@@ -362,9 +371,14 @@ const getPhysics = () => {
 };
 
 /**
- * Applies spring-damper physics to pull the ship toward the mouse target.
- * The mouse defines a target position, never the ship's actual position -
- * the ship accelerates toward it with momentum and settles without snapping.
+ * Chases the mouse target with an arcade-style accelerate/chase model.
+ * The mouse defines a target position, never the ship's actual position:
+ * each frame we compute the velocity the ship *wants* (toward the target,
+ * scaled by distance and capped at maxSpeed) and smoothly accelerate the
+ * ship's actual velocity toward that. Because the desired speed itself
+ * shrinks as the ship nears the target, this can never overshoot or
+ * oscillate - it just decelerates and settles, while still ramping up
+ * with visible momentum on big, fast mouse moves.
  * @param {number} dt - Delta time
  */
 const updateShipPhysics = (dt) => {
@@ -379,17 +393,23 @@ const updateShipPhysics = (dt) => {
     // Displacement from ship to mouse
     const dx = targetOX - shipX;
     const dy = targetOY - shipY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
 
-    // Critically-damped spring: acceleration scales with displacement (large
-    // jumps pull harder, small nudges pull gently) and is opposed by velocity
-    // damping so the ship settles instead of oscillating around the target.
-    const ax = dx * physics.stiffness - velocityX * physics.damping;
-    const ay = dy * physics.stiffness - velocityY * physics.damping;
+    // Desired velocity: straight at the target, faster the further away we
+    // are, capped at top speed.
+    let desiredVX = 0;
+    let desiredVY = 0;
+    if (dist > 0.001) {
+        const desiredSpeed = Math.min(dist * physics.catchUpRate, physics.maxSpeed);
+        desiredVX = (dx / dist) * desiredSpeed;
+        desiredVY = (dy / dist) * desiredSpeed;
+    }
 
-    velocityX += ax * dt;
-    velocityY += ay * dt;
+    // Frame-rate independent exponential chase toward the desired velocity.
+    const chase = 1 - Math.exp(-physics.acceleration * dt);
+    velocityX += (desiredVX - velocityX) * chase;
+    velocityY += (desiredVY - velocityY) * chase;
 
-    // Clamp to max speed
     let speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
     if (speed > physics.maxSpeed) {
         const clamp = physics.maxSpeed / speed;
@@ -413,7 +433,9 @@ const updateShipPhysics = (dt) => {
     else if (shipY > maxY) { shipY = maxY; if (velocityY > 0) velocityY = 0; }
 
     // Snap once close and slow enough - avoids perpetual sub-pixel drift.
-    const distToTarget = Math.sqrt(dx * dx + dy * dy);
+    const distToTarget = Math.sqrt(
+        (targetOX - shipX) * (targetOX - shipX) + (targetOY - shipY) * (targetOY - shipY)
+    );
     if (distToTarget < physics.settleDistance && speed < physics.settleSpeed) {
         shipX = targetOX;
         shipY = targetOY;
@@ -601,21 +623,19 @@ const render = () => {
         if (!reducedMotion) {
             const physics = getPhysics();
 
-            // --- Yaw (screen-plane facing): Z-axis ---
-            // Top-down view keeps heading on Z so the nose tracks left/right on screen.
+            // --- Yaw (screen-plane facing) ---
+            // Smoothly turn toward the heading derived from actual movement.
             const targetRotationZ = currentHeading + Math.PI;
             const yawDiff = Math.atan2(
                 Math.sin(targetRotationZ - currentModelRotationZ),
                 Math.cos(targetRotationZ - currentModelRotationZ)
             );
-            currentModelRotationZ += yawDiff * 0.7;
-            modelGroup.rotation.z = currentModelRotationZ;
+            currentModelRotationZ += yawDiff * 0.65;
 
-            // --- Pitch (nose up/down): X-axis offset from base top-down tilt ---
+            // --- Pitch (nose up/down): offset from the base top-down tilt ---
             currentSmoothedPitch += (targetPitch - currentSmoothedPitch) * 0.15;
-            modelGroup.rotation.x = baseRotationX + currentSmoothedPitch;
 
-            // --- Roll (bank into turns): Y-axis ---
+            // --- Roll (bank into turns) ---
             // Driven primarily by turn rate so the craft leans when it yaws.
             // Lateral velocity adds a bit of extra bank during drift.
             const headingDelta = Math.atan2(
@@ -633,13 +653,25 @@ const render = () => {
 
             // Negative so craft banks into the turn (left turn -> left wing down)
             let targetRoll = -angularVelocity * physics.rollResponse;
-            targetRoll -= lateralVel * 0.0025;
+            targetRoll -= lateralVel * 0.0015;
             // Clamp to max bank
             if (targetRoll > physics.maxBank) targetRoll = physics.maxBank;
             if (targetRoll < -physics.maxBank) targetRoll = -physics.maxBank;
 
             currentSmoothedRoll += (targetRoll - currentSmoothedRoll) * physics.rollSmooth;
-            modelGroup.rotation.y = currentSmoothedRoll;
+
+            // Compose the final orientation as two separate rotations rather
+            // than a single XYZ Euler: pitch+roll+base-tilt define the ship's
+            // fixed 3/4 flight attitude in its own local frame, and yaw is
+            // then applied as an outer rotation around the camera-facing
+            // world Z-axis. Folding yaw into the same Euler as the ~103°
+            // base tilt (as this used to do) rotates it around a skewed axis
+            // once the tilt is applied, so it stops reading as "turn left/
+            // right on screen" and can spin the flat mesh edge-on to camera.
+            _attitudeEuler.set(baseRotationX + currentSmoothedPitch, currentSmoothedRoll, 0, 'XYZ');
+            _attitudeQuat.setFromEuler(_attitudeEuler);
+            _yawQuat.setFromAxisAngle(_yawAxis, currentModelRotationZ);
+            modelGroup.quaternion.copy(_yawQuat).multiply(_attitudeQuat);
         } else {
             updateRotation(dt, now);
         }
