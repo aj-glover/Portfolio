@@ -37,7 +37,7 @@ import pixelArtTips from './pixel-art-tips.js';
  * The full list of projects, in display order.
  * Add new projects by creating a file in this folder and importing it here.
  */
-export const PROJECTS = [
+const RAW_PROJECTS = [
     healthcareNonprofit,
     whaleMembersYoutube,
     freshstepMoldCarpetCleaning,
@@ -68,3 +68,23 @@ export const PROJECTS = [
     caiGuoQiangNft,
     pixelArtTips
 ];
+
+// Project files reference local images as "/src/assets/projects/..." paths, which
+// only resolve during `vite dev`. The images actually live in public/assets/projects
+// (copied verbatim into dist/ at build time), so rewrite those references to respect
+// the deployed base path (e.g. "/Portfolio/") instead of assuming the site is served
+// from "/".
+const SRC_ASSET_PREFIX = '/src/assets/';
+const BASE = import.meta.env.BASE_URL;
+
+function resolveAssetPath(value) {
+    if (typeof value !== 'string' || !value.startsWith(SRC_ASSET_PREFIX)) return value;
+    return `${BASE}${value.slice(SRC_ASSET_PREFIX.length)}`;
+}
+
+export const PROJECTS = RAW_PROJECTS.map(project => ({
+    ...project,
+    thumbnail: resolveAssetPath(project.thumbnail),
+    hero: resolveAssetPath(project.hero),
+    gallery: Array.isArray(project.gallery) ? project.gallery.map(resolveAssetPath) : project.gallery
+}));
