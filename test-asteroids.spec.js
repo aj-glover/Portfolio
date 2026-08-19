@@ -19,7 +19,7 @@ test.describe('Asteroid Visibility & Shootability Tests', () => {
    * for the ambient debug hook to appear (proves the ambient layer is live).
    */
   async function loadAndEnterUniverse(page) {
-    await page.goto('http://localhost:3003/');
+    await page.goto('http://localhost:3003/Portfolio/');
 
     // Wait for the init sequence to finish and the intro "Enter Universe"
     // button to appear (init sequence is ~4.2s on first visit).

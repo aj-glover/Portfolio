@@ -2,15 +2,30 @@
  * src/game/ambient/asteroids.js - Pooled drifting asteroids (requirements #2, #3, #13).
  *
  * Replaces the create/dispose-per-asteroid approach with a fixed pool that is
- * built once and recycled forever. Each pooled asteroid keeps its own deformed
- * geometry (so they look distinct) but is never freed until teardown.
+ * built once and recycled forever. Each pooled asteroid clones one of four
+ * sculpted boulder models (so they look distinct) but is never freed until
+ * teardown.
  *
  * Deliberately carries NO score, health, ammo or progression — destroying one
  * simply schedules a respawn. Asteroids are never linked to portfolio content.
  */
 
 import { Mesh, IcosahedronGeometry, MeshStandardMaterial, Color } from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { createPool } from './pool.js';
+
+/**
+ * Sculpted boulder models (Meshy AI), decimated + meshopt/webp-compressed down
+ * from ~220MB combined to ~600KB. Each pool slot clones one of these at random
+ * instead of the old per-instance deformed icosahedron.
+ */
+const MODEL_URLS = [
+    'models/boulder-1.glb',
+    'models/boulder-2.glb',
+    'models/boulder-3.glb',
+    'models/boulder-4.glb'
+];
 
 /** Destruction resolves in this window (requirement #3: ~200-500ms). */
 const FRAGMENT_LIFE = [0.2, 0.5];
@@ -41,22 +56,56 @@ let asteroidPool = null;
 let fragmentPool = null;
 let sceneRef = null;
 let profileRef = null;
+let loadingModels = false;
+
+/** Loaded boulder templates: [{ geometry, material }]. Shared across pool instances. */
+let boulderTemplates = [];
 
 /** Pending respawn timestamps (performance.now ms). */
 let respawnQueue = [];
 
 /**
- * Builds one irregular asteroid geometry.
+ * Loads and normalizes the four boulder models. Each geometry is re-centered
+ * and scaled so its bounding sphere has radius 1 — matching the old
+ * IcosahedronGeometry(1, 1) convention so `mesh.scale.setScalar(radius)` in
+ * respawn() still yields a real on-screen radius in pixels.
+ * @returns {Promise<Array<{geometry: import('three').BufferGeometry, material: MeshStandardMaterial}>>}
  */
-const makeGeometry = () => {
-    const geom = new IcosahedronGeometry(1, 1);
-    const pos = geom.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-        const n = 1 + (Math.random() - 0.5) * 0.35;
-        pos.setXYZ(i, pos.getX(i) * n, pos.getY(i) * n, pos.getZ(i) * n);
-    }
-    geom.computeVertexNormals();
-    return geom;
+const loadBoulderModels = async () => {
+    const loader = new GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder);
+    const base = import.meta.env.BASE_URL;
+
+    return Promise.all(MODEL_URLS.map((url) => new Promise((resolve, reject) => {
+        loader.load(
+            `${base}${url}`,
+            (gltf) => {
+                let mesh = null;
+                gltf.scene.traverse((child) => {
+                    if (!mesh && child.isMesh) mesh = child;
+                });
+                if (!mesh) {
+                    reject(new Error(`[Asteroids] No mesh found in ${url}`));
+                    return;
+                }
+
+                const geometry = mesh.geometry;
+                geometry.computeBoundingSphere();
+                const sphere = geometry.boundingSphere;
+                geometry.translate(-sphere.center.x, -sphere.center.y, -sphere.center.z);
+                const scale = 1 / (sphere.radius || 1);
+                geometry.scale(scale, scale, scale);
+
+                const material = mesh.material;
+                material.emissive = new Color(0x66ccff);
+                material.emissiveIntensity = 0;
+
+                resolve({ geometry, material });
+            },
+            undefined,
+            reject
+        );
+    })));
 };
 
 /**
@@ -120,28 +169,43 @@ const respawn = (mesh, insideViewport = false) => {
 
 
 /**
- * Creates pools and seeds the initial asteroid population.
+ * Creates pools and seeds the initial asteroid population. Boulder models are
+ * loaded asynchronously first (requirement: real Meshy AI models replace the
+ * old procedural icosahedrons) — asteroids simply stay absent from the scene
+ * until that resolves, which given the ~150KB compressed models is fast.
  * @param {import('three').Scene} scene
  * @param {object} profile
  */
 export const init = (scene, profile) => {
-    if (asteroidPool) return;
+    if (asteroidPool || loadingModels) return;
     sceneRef = scene;
     profileRef = profile;
+    loadingModels = true;
 
+    loadBoulderModels()
+        .then((templates) => {
+            loadingModels = false;
+            if (!sceneRef) return; // dispose() ran while models were loading
+            boulderTemplates = templates;
+            buildPools(scene, profile);
+        })
+        .catch((err) => {
+            loadingModels = false;
+            console.error('[Asteroids] Failed to load boulder models:', err);
+        });
+};
+
+/**
+ * Builds the asteroid + fragment pools once boulder models are loaded.
+ * @param {import('three').Scene} scene
+ * @param {object} profile
+ */
+const buildPools = (scene, profile) => {
     asteroidPool = createPool(
         profile.maxAsteroids,
         () => {
-            const mat = new MeshStandardMaterial({
-                color: new Color().setHSL(0.08, 0.06, 0.34 + Math.random() * 0.18),
-
-                roughness: 0.85,
-                metalness: 0.1,
-                flatShading: true,
-                emissive: new Color(0x66ccff),
-                emissiveIntensity: 0
-            });
-            const mesh = new Mesh(makeGeometry(), mat);
+            const tpl = boulderTemplates[Math.floor(Math.random() * boulderTemplates.length)];
+            const mesh = new Mesh(tpl.geometry, tpl.material.clone());
             mesh.visible = false;
             mesh.userData = {};
             scene.add(mesh);
@@ -204,7 +268,8 @@ const burst = (mesh) => {
         // Fragment geometry is radius 5px, so this yields ~3-9px chunks —
         // small debris, proportional to the parent, never an explosion.
         frag.scale.setScalar(0.6 + Math.random() * 1.2);
-        frag.material.color.copy(mesh.material.color);
+        // Boulder materials are textured with a white base color factor, so
+        // copying it would wash fragments out — keep their own rock tint.
         frag.material.opacity = 1;
         frag.visible = true;
 
@@ -327,12 +392,21 @@ export const update = (ctx) => {
  */
 export const dispose = () => {
     if (asteroidPool) {
+        // Geometry is shared per boulder template (disposed below, once each);
+        // only the per-instance cloned material belongs to this mesh alone.
         asteroidPool.items.forEach((m) => {
             sceneRef?.remove(m);
-            m.geometry.dispose();
             m.material.dispose();
         });
     }
+    boulderTemplates.forEach((tpl) => {
+        tpl.geometry.dispose();
+        ['map', 'normalMap', 'metalnessMap', 'roughnessMap', 'aoMap', 'emissiveMap'].forEach((slot) => {
+            tpl.material[slot]?.dispose();
+        });
+        tpl.material.dispose();
+    });
+    boulderTemplates = [];
     if (fragmentPool) {
         // All fragments share one geometry — dispose it once.
         let sharedGeom = null;
@@ -347,6 +421,7 @@ export const dispose = () => {
     fragmentPool = null;
     respawnQueue = [];
     sceneRef = null;
+    loadingModels = false;
 };
 
 export default { init, update, hitTest, dispose };
