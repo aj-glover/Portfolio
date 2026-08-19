@@ -35,9 +35,9 @@ const FRAGMENT_LIFE = [0.2, 0.5];
  *
  * The overlay camera is orthographic sized to the viewport, so 1 world unit is
  * 1 screen pixel and the ship model is normalised to 60px. Radii here are
- * therefore real on-screen sizes (28-76px across) rather than abstract scales.
+ * therefore real on-screen sizes (42-114px across) rather than abstract scales.
  */
-const RADIUS_RANGE = [14, 38];
+const RADIUS_RANGE = [21, 57];
 
 /** Drift speed in px/s, before the per-asteroid depth (parallax) multiplier. */
 const SPEED_RANGE = [35, 105];
