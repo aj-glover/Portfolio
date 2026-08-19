@@ -6,6 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "deploy": "vite build && gh-pages -d dist",
     "new-project": "node scripts/new-project.mjs"
   },
   "devDependencies": {

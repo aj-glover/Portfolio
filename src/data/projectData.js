@@ -10,6 +10,8 @@
 
 import { PROJECTS } from './projects/index.js';
 
+const BASE = import.meta.env.BASE_URL;
+
 export const PORTFOLIO = {
     name: "AJ",
     tagline: "Creative Universe Portfolio",
@@ -28,7 +30,7 @@ export const CATEGORIES = {
         orbitRadius: 10,
         yOffset: 4,
         description: "User experience & interface design",
-        planetModel: "/models/019fde95-ca3b-743f-bd61-a3377b36ec5f.glb",
+        planetModel: `${BASE}models/019fde95-ca3b-743f-bd61-a3377b36ec5f.glb`,
         projects: ["rhymebook-app", "fanrant", "shake-it", "woundx", "contact-sheet-pro", "stolen-car-assistance"]
     },
     "Video": {
@@ -40,7 +42,7 @@ export const CATEGORIES = {
         orbitRadius: 10,
         yOffset: -2.5,
         description: "Video production & motion graphics",
-        planetModel: "/models/019fde7b-4d3f-70f4-b687-6ac367eaa9db.glb",
+        planetModel: `${BASE}models/019fde7b-4d3f-70f4-b687-6ac367eaa9db.glb`,
         projects: [
             "freshstep-duct-cleaning",
             "nawco-heal-conference",
@@ -62,7 +64,7 @@ export const CATEGORIES = {
         orbitRadius: 10,
         yOffset: 3,
         description: "Growth marketing & digital strategy",
-        planetModel: "/models/019fde7f-e903-73d5-97ff-ed94cdcacd2e.glb",
+        planetModel: `${BASE}models/019fde7f-e903-73d5-97ff-ed94cdcacd2e.glb`,
         projects: ["healthcare-nonprofit", "whale-members-youtube", "freshstep-mold-carpet-cleaning", "marketing-intellect"]
     },
     "Photo": {
@@ -74,7 +76,7 @@ export const CATEGORIES = {
         orbitRadius: 10,
         yOffset: -4,
         description: "Visual storytelling through the lens",
-        planetModel: "/models/019fde80-3c0a-71e0-bf8e-ebe4141c9272.glb",
+        planetModel: `${BASE}models/019fde80-3c0a-71e0-bf8e-ebe4141c9272.glb`,
         projects: [
             "uppercuts-editorial",
             "kelow-latesha-submerged",
@@ -98,7 +100,7 @@ export const CATEGORIES = {
         orbitRadius: 10,
         yOffset: 1,
         description: "Personal portfolio & professional journey",
-        planetModel: "/models/019fde80-6581-7e7e-879f-eee203bf0e65.glb",
+        planetModel: `${BASE}models/019fde80-6581-7e7e-879f-eee203bf0e65.glb`,
         projects: []
     }
 };

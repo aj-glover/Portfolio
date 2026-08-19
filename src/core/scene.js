@@ -326,7 +326,7 @@ export const spawnAstronaut = (planet) => {
 
     return new Promise((resolve) => {
         astronautGltfLoader.load(
-            '/models/astronaut.glb',
+            `${import.meta.env.BASE_URL}models/astronaut.glb`,
             (gltf) => {
                 astronautObject = gltf.scene;
                 astronautObject.name = 'astronaut';
