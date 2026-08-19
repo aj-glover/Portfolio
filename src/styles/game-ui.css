@@ -350,33 +350,6 @@
     color: var(--game-color-dim);
 }
 
-.game-hud-map-btn {
-    margin-top: 6px;
-    padding: 4px 10px;
-    font-family: var(--game-font);
-    font-size: 9px;
-    letter-spacing: 0.15em;
-    color: var(--game-color-primary);
-    background: transparent;
-    border: 1px solid rgba(102, 204, 255, 0.4);
-    border-radius: 2px;
-    cursor: pointer;
-    pointer-events: auto;
-    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
-    text-transform: uppercase;
-}
-
-.game-hud-map-btn:hover {
-    background: rgba(102, 204, 255, 0.15);
-    border-color: rgba(102, 204, 255, 0.8);
-    box-shadow: var(--game-glow);
-}
-
-.game-hud-map-btn:focus-visible {
-    outline: 2px solid var(--game-color-primary);
-    outline-offset: 2px;
-}
-
 /* --- Bottom-left: Location --- */
 .game-hud-location {
     position: absolute;
@@ -855,11 +828,6 @@
         font-size: 7px;
     }
 
-    .game-hud-map-btn {
-        font-size: 7px;
-        padding: 3px 8px;
-    }
-
     .game-hud-location {
         bottom: 12px;
         left: 12px;
@@ -925,7 +893,6 @@
    ========================================================================== */
 
 /* Ensure all interactive game elements have visible focus */
-.game-hud-map-btn:focus-visible,
 .game-hud-sound-toggle:focus-visible {
     outline: 2px solid var(--game-color-primary);
     outline-offset: 2px;

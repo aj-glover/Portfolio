@@ -61,7 +61,6 @@ const build = () => {
     sectorInfoEl.innerHTML = `
         <span class="game-hud-sector-label">SECTOR 01</span>
         <span class="game-hud-sector-objects" id="game-hud-objects">07 OBJECTS</span>
-        <button class="game-hud-map-btn" id="game-hud-map" aria-label="Open navigation map">[ MAP ]</button>
     `;
     hudEl.appendChild(sectorInfoEl);
 
@@ -110,14 +109,6 @@ const build = () => {
     hudEl.appendChild(soundToggleEl);
 
     document.body.appendChild(hudEl);
-
-    // Bind map button
-    const mapBtn = document.getElementById('game-hud-map');
-    if (mapBtn) {
-        mapBtn.addEventListener('click', () => {
-            if (onMapClick) onMapClick();
-        });
-    }
 
     // Listen for M key for map
     document.addEventListener('keydown', (e) => {
