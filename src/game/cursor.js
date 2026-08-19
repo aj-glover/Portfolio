@@ -119,12 +119,15 @@ const idlePhaseRock = Math.random() * Math.PI * 2;
 // ============================================================================
 
 const PHYSICS = {
-    deadZone: 50,            // pixels - no force when mouse is close to ship
-    maxSpeed: 800,           // max ship speed in orthographic px/s
-    stiffness: 4.0,          // spring stiffness (pull toward mouse)
-    damping: 2.5,            // velocity damping (higher = less drift)
+    maxSpeed: 900,           // max ship speed in orthographic px/s
+    stiffness: 140,          // spring constant pulling ship toward the mouse target
+    damping: 21,             // velocity damping (~0.85 damping ratio at this stiffness - minimal overshoot)
+    edgeMargin: 40,          // px kept clear around the viewport edge
+    settleDistance: 0.4,     // px - snap to target when this close and slow
+    settleSpeed: 4,          // px/s - snap to target when slower than this
+    headingSpeedThreshold: 18, // px/s - below this, hold last heading instead of re-aiming
     maxBank: 1.0,            // maximum roll/bank angle (radians) when turning
-    maxPitch: 0.4,           // maximum pitch angle (radians) - from mouse up/down
+    maxPitch: 0.4,           // maximum pitch angle (radians) - from vertical movement
     rollResponse: 0.55,      // how strongly turn rate maps into roll
     rollSmooth: 0.18,        // roll interpolation factor (higher = snappier bank)
 };
@@ -359,8 +362,9 @@ const getPhysics = () => {
 };
 
 /**
- * Applies spring physics to pull ship toward mouse position.
- * Ship acts as a physics-based cursor with weight and drift.
+ * Applies spring-damper physics to pull the ship toward the mouse target.
+ * The mouse defines a target position, never the ship's actual position -
+ * the ship accelerates toward it with momentum and settles without snapping.
  * @param {number} dt - Delta time
  */
 const updateShipPhysics = (dt) => {
@@ -372,54 +376,66 @@ const updateShipPhysics = (dt) => {
     const targetOX = targetX - w / 2;
     const targetOY = h / 2 - targetY;
 
-    // Distance from ship to mouse
+    // Displacement from ship to mouse
     const dx = targetOX - shipX;
     const dy = targetOY - shipY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
 
-    // No force within dead zone
-    if (distance < physics.deadZone) {
-        velocityX *= Math.pow(1 - physics.damping * dt * 0.1, dt * 60);
-        velocityY *= Math.pow(1 - physics.damping * dt * 0.1, dt * 60);
-    } else {
-        // Spring force: pull toward mouse (stiffness * displacement)
-        const forceScale = physics.stiffness / distance;
-        const fx = dx * forceScale;
-        const fy = dy * forceScale;
+    // Critically-damped spring: acceleration scales with displacement (large
+    // jumps pull harder, small nudges pull gently) and is opposed by velocity
+    // damping so the ship settles instead of oscillating around the target.
+    const ax = dx * physics.stiffness - velocityX * physics.damping;
+    const ay = dy * physics.stiffness - velocityY * physics.damping;
 
-        // Apply spring force
-        velocityX += fx * dt * 60;
-        velocityY += fy * dt * 60;
-
-        // Damping (proportional to velocity)
-        velocityX -= velocityX * physics.damping * dt;
-        velocityY -= velocityY * physics.damping * dt;
-    }
+    velocityX += ax * dt;
+    velocityY += ay * dt;
 
     // Clamp to max speed
-    const speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+    let speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
     if (speed > physics.maxSpeed) {
         const clamp = physics.maxSpeed / speed;
         velocityX *= clamp;
         velocityY *= clamp;
+        speed = physics.maxSpeed;
     }
 
     // Update position
     shipX += velocityX * dt;
     shipY += velocityY * dt;
 
-    // Ship heading faces toward mouse for rotational control (yaw)
-    if (distance > 10) {
-        currentHeading = Math.atan2(dy, dx);
+    // Keep the ship comfortably inside the viewport, even mid-overshoot.
+    const minX = -w / 2 + physics.edgeMargin;
+    const maxX = w / 2 - physics.edgeMargin;
+    const minY = -h / 2 + physics.edgeMargin;
+    const maxY = h / 2 - physics.edgeMargin;
+    if (shipX < minX) { shipX = minX; if (velocityX < 0) velocityX = 0; }
+    else if (shipX > maxX) { shipX = maxX; if (velocityX > 0) velocityX = 0; }
+    if (shipY < minY) { shipY = minY; if (velocityY < 0) velocityY = 0; }
+    else if (shipY > maxY) { shipY = maxY; if (velocityY > 0) velocityY = 0; }
+
+    // Snap once close and slow enough - avoids perpetual sub-pixel drift.
+    const distToTarget = Math.sqrt(dx * dx + dy * dy);
+    if (distToTarget < physics.settleDistance && speed < physics.settleSpeed) {
+        shipX = targetOX;
+        shipY = targetOY;
+        velocityX = 0;
+        velocityY = 0;
+        speed = 0;
     }
 
-    // Pitch: vertical mouse offset from ship controls pitch angle
-    // Mouse above ship (negative dy) = pitch down; mouse below (positive dy) = pitch up
-    if (distance > 10) {
-        const normalizedVertDist = Math.min(Math.abs(dy) / (h * 0.4), 1);
-        targetPitch = -Math.sign(dy) * normalizedVertDist * physics.maxPitch;
+    // Heading (yaw) follows the ship's actual movement direction, not the
+    // mouse - it holds its last value while slow/stopped instead of spinning.
+    if (speed > physics.headingSpeedThreshold) {
+        currentHeading = Math.atan2(velocityY, velocityX);
+    }
+
+    // Pitch follows the vertical component of the ship's own velocity
+    // (same sign convention the old mouse-offset pitch used), and eases
+    // back to neutral as the ship slows rather than snapping to zero.
+    if (speed > physics.headingSpeedThreshold) {
+        const normalizedVertSpeed = Math.min(Math.abs(velocityY) / physics.maxSpeed, 1);
+        targetPitch = -Math.sign(velocityY) * normalizedVertSpeed * physics.maxPitch;
     } else {
-        targetPitch = 0;
+        targetPitch *= 0.9;
     }
 };
 
