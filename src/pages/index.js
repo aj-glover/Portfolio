@@ -12,7 +12,6 @@ import '../styles/ambient.css';
 
 import { setupScene, animate, getCamera, initializeEnvironmentObjects } from '../core/scene.js';
 import { initializeCamera } from '../core/camera.js';
-import { initLenis } from '../assets/lenis-wrapper.js'; // Placeholder for Lenis setup
 import navigationSystem from '../systems/navigation.js';
 import UniverseIntro from '../ui/UniverseIntro.js';
 
@@ -80,15 +79,12 @@ const initializeApp = async () => {
         const totalObjects = Object.values(CATEGORIES).reduce((sum, cat) => sum + (cat.projects || []).length, 0);
         hud.setObjectCount(totalObjects);
 
-        // 5. Start global smooth scrolling mechanism
-        initLenis();
-
-        // 6. Show the init sequence, then universe intro, then navigation
+        // 5. Show the init sequence, then universe intro, then navigation
         initSequence.show(() => {
             const intro = new UniverseIntro();
             intro.show();
             intro.setOnDismiss(() => {
-                // 7. Initialize the navigation system (hover/click/detail/return flow)
+                // 6. Initialize the navigation system (hover/click/detail/return flow)
                 navigationSystem.init();
                 // Lazy-load cursor after intro is dismissed for better initial load time
                 cursor.init().catch(err => {
@@ -97,7 +93,7 @@ const initializeApp = async () => {
             });
         });
 
-        // 8. Start the animation loop
+        // 7. Start the animation loop
         animate();
 
         console.log("--- Phase 3B: Universe Portfolio is Running ---");

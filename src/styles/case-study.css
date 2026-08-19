@@ -15,17 +15,16 @@
     font-family: sans-serif;
     z-index: 1000;
     padding: 2rem;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(102, 204, 255, 0.4) transparent;
+    /* The thematic scroll indicator (.case-study-scroll-indicator) is the
+       only scroll affordance here - the native scrollbar is hidden so it
+       doesn't duplicate it, and so precise thumb-dragging with the laggy
+       ship cursor is never required to navigate the page. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .case-study-overlay::-webkit-scrollbar {
-    width: 6px;
-}
-
-.case-study-overlay::-webkit-scrollbar-thumb {
-    background: rgba(102, 204, 255, 0.4);
-    border-radius: 3px;
+    display: none;
 }
 
 .case-study-hero {
