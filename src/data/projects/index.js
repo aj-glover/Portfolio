@@ -74,7 +74,7 @@ const RAW_PROJECTS = [
 // (copied verbatim into dist/ at build time), so rewrite those references to respect
 // the deployed base path (e.g. "/Portfolio/") instead of assuming the site is served
 // from "/".
-const SRC_ASSET_PREFIX = '/src/assets/';
+const SRC_ASSET_PREFIX = '/src/';
 const BASE = import.meta.env.BASE_URL;
 
 function resolveAssetPath(value) {
