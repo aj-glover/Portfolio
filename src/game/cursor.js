@@ -581,6 +581,43 @@ const updateThrustAnimation = (time) => {
 };
 
 // ============================================================================
+// EDGE AUTO-SCROLL
+// ============================================================================
+
+/** Screen-space distance (px) from the top/bottom edge within which the ship starts scrolling the open panel. */
+const SCROLL_EDGE_MARGIN = 140;
+
+/** Auto-scroll speed (px/s) reached once the ship is flush against the edge. */
+const SCROLL_MAX_SPEED = 900;
+
+/**
+ * Scrolls the open case-study / about panel while the ship sits near the
+ * top or bottom edge of the viewport, so reaching the end of a long page
+ * never requires hunting for a scrollbar under the ship.
+ * @param {number} dt - Delta time
+ */
+const updateEdgeAutoScroll = (dt) => {
+    const overlay = document.querySelector('.case-study-overlay, .about-view');
+    if (!overlay || overlay.style.display !== 'flex') return;
+    if (overlay.scrollHeight <= overlay.clientHeight) return;
+
+    const h = window.innerHeight;
+    const shipScreenY = h / 2 - shipY;
+
+    let speed = 0;
+    if (shipScreenY > h - SCROLL_EDGE_MARGIN) {
+        speed = Math.min((shipScreenY - (h - SCROLL_EDGE_MARGIN)) / SCROLL_EDGE_MARGIN, 1) * SCROLL_MAX_SPEED;
+    } else if (shipScreenY < SCROLL_EDGE_MARGIN) {
+        speed = -Math.min((SCROLL_EDGE_MARGIN - shipScreenY) / SCROLL_EDGE_MARGIN, 1) * SCROLL_MAX_SPEED;
+    }
+
+    if (speed !== 0) {
+        const maxScroll = overlay.scrollHeight - overlay.clientHeight;
+        overlay.scrollTop = Math.max(0, Math.min(maxScroll, overlay.scrollTop + speed * dt));
+    }
+};
+
+// ============================================================================
 // RENDER LOOP
 // ============================================================================
 
@@ -613,6 +650,8 @@ const render = () => {
         velocityX = 0;
         velocityY = 0;
     }
+
+    updateEdgeAutoScroll(dt);
 
     // --- Position the 3D model ---
     if (modelGroup && modelLoaded) {
