@@ -22,22 +22,14 @@
     <meta name="twitter:title" content="AJ Glover — Creative Universe Portfolio">
     <meta name="twitter:description" content="Explore the creative universe of AJ Glover — marketing strategy, UX/UI design, video production, growth marketing, and photography.">
 
-  <link rel="stylesheet" crossorigin href="/Portfolio/index.css">
-  <!-- Loading screen: must run before the app bundle so it can track asset requests -->
-  <script src="/Portfolio/loading-screen.js"></script>
-  <script src="/Portfolio/performance-monitor.js"></script>
+    <link rel="stylesheet" href="./dist/styles.css"> 
+    <!-- Vite will handle CSS bundling -->
   <script type="module" crossorigin src="/Portfolio/index.js"></script>
-  <script>
-    // Register service worker for offline support and caching
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/Portfolio/sw.js')
-        .then(reg => console.log('[ServiceWorker] Registered'))
-        .catch(err => console.log('[ServiceWorker] Registration failed:', err));
-    }
-  </script>
+  <link rel="stylesheet" crossorigin href="/Portfolio/index.css">
 </head>
 <body>
-    <!-- Main App Root -->
+    <!-- Loading screen and main scene canvas will be injected here by the SPA core -->
     <div id="root"></div>
+
 </body>
 </html>

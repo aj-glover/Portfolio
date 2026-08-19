@@ -1,8 +1,0 @@
-# Universe Portfolio - AJ Glover
-# https://aj-glover.github.io/
-
-User-agent: *
-Allow: /
-
-# Sitemap
-Sitemap: https://aj-glover.github.io/sitemap.xml
