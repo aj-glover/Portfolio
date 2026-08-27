@@ -82,9 +82,33 @@ function resolveAssetPath(value) {
     return `${BASE}${value.slice(SRC_ASSET_PREFIX.length)}`;
 }
 
+// The files under public/assets/projects are camera originals (up to 6016x4016
+// and 20MB each). scripts/optimize-images.mjs writes two web-sized derivatives
+// next to every original; point the app at those instead.
+//
+//   .thumb.jpg (512px) - card textures, loaded eagerly at startup
+//   .web.jpg  (1600px) - case-study hero and gallery images
+//
+// Remote thumbnails (YouTube) and images with no derivative are left as-is.
+const LOCAL_IMAGE_RE = /\.(jpe?g|png)$/i;
+
+/**
+ * Rewrites a local project image to a generated derivative.
+ * @param {*} value - Already base-resolved asset path.
+ * @param {'.thumb.jpg'|'.web.jpg'} suffix - Which derivative to use.
+ * @returns {*} The derivative path, or the input unchanged.
+ */
+function useDerivative(value, suffix) {
+    if (typeof value !== 'string' || !LOCAL_IMAGE_RE.test(value)) return value;
+    if (!value.includes('/assets/projects/')) return value;
+    return value.replace(LOCAL_IMAGE_RE, suffix);
+}
+
 export const PROJECTS = RAW_PROJECTS.map(project => ({
     ...project,
-    thumbnail: resolveAssetPath(project.thumbnail),
-    hero: resolveAssetPath(project.hero),
-    gallery: Array.isArray(project.gallery) ? project.gallery.map(resolveAssetPath) : project.gallery
+    thumbnail: useDerivative(resolveAssetPath(project.thumbnail), '.thumb.jpg'),
+    hero: useDerivative(resolveAssetPath(project.hero), '.web.jpg'),
+    gallery: Array.isArray(project.gallery)
+        ? project.gallery.map(v => useDerivative(resolveAssetPath(v), '.web.jpg'))
+        : project.gallery
 }));

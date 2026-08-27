@@ -30,3 +30,10 @@ dist/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Pre-optimization asset originals. Kept locally as the archival copy and
+# deliberately outside public/ so Vite does not copy them into the deploy.
+# Derivatives are regenerated with scripts/optimize-models.mjs.
+.asset-originals/
+public/models/*.orig.glb
+public/models/*.opt.glb
