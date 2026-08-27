@@ -5,7 +5,7 @@
 import {
     Scene, PerspectiveCamera, WebGLRenderer, AmbientLight, DirectionalLight,
     Group, Color, Mesh, TorusGeometry, MeshBasicMaterial, Sprite, SpriteMaterial,
-    CanvasTexture, AdditiveBlending, Box3, Vector3
+    CanvasTexture, AdditiveBlending, Box3, Vector3, MathUtils
 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
@@ -66,7 +66,7 @@ export const setupScene = () => {
     sceneInstance = new Scene();
     sceneInstance.background = null;
 
-    cameraInstance = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+    cameraInstance = new PerspectiveCamera(BASE_FOV, window.innerWidth / window.innerHeight, 0.1, 2000);
     cameraInstance.position.set(0, 0, 12);
     cameraInstance.lookAt(0, 0, 0);
 
@@ -96,12 +96,45 @@ export const setupScene = () => {
     console.log("[Scene] Setup complete.");
 };
 
+/** Design aspect ratio the scene layout was composed for (desktop landscape). */
+const DESIGN_ASPECT = 16 / 9;
+
+/** Vertical FOV the scene layout was composed for. */
+const BASE_FOV = 60;
+
+/**
+ * Computes a vertical FOV that keeps the *horizontal* field of view constant
+ * once the viewport is narrower than the design aspect.
+ *
+ * PerspectiveCamera.fov is vertical, so on a portrait phone the horizontal FOV
+ * collapses and the ring of category planets falls outside the frustum — the
+ * planets become literally unreachable. Widening the vertical FOV on narrow
+ * viewports restores the intended horizontal coverage.
+ *
+ * @param {number} aspect - Viewport aspect ratio (width / height).
+ * @returns {number} Vertical FOV in degrees.
+ */
+const computeFov = (aspect) => {
+    if (aspect >= DESIGN_ASPECT) return BASE_FOV;
+
+    const baseVRad = MathUtils.degToRad(BASE_FOV);
+    // Horizontal half-angle we want to preserve, taken from the design aspect.
+    const targetHalfH = Math.atan(Math.tan(baseVRad / 2) * DESIGN_ASPECT);
+    // Vertical FOV that yields that horizontal half-angle at the current aspect.
+    const vRad = 2 * Math.atan(Math.tan(targetHalfH) / Math.max(aspect, 0.0001));
+
+    // Clamp so ultra-narrow viewports don't distort into a fisheye.
+    return MathUtils.clamp(MathUtils.radToDeg(vRad), BASE_FOV, 100);
+};
+
 /**
  * Handles window resizing for the active camera and renderer.
  */
 const onResize = () => {
     if (!cameraInstance || !rendererInstance) return;
-    cameraInstance.aspect = window.innerWidth / window.innerHeight;
+    const aspect = window.innerWidth / window.innerHeight;
+    cameraInstance.aspect = aspect;
+    cameraInstance.fov = computeFov(aspect);
     cameraInstance.updateProjectionMatrix();
     rendererInstance.setSize(window.innerWidth, window.innerHeight);
 };

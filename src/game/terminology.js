@@ -38,7 +38,33 @@ const getStandardTerm = (term) => {
     return term;
 };
 
+/**
+ * @returns {boolean} true when the primary input is touch (no hover).
+ */
+const isTouch = () => typeof window !== 'undefined'
+    && window.matchMedia
+    && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+/**
+ * Instruction copy for entering a project, phrased for the actual input
+ * device. "Hover"/"Click" are meaningless — and misleading — on a phone.
+ * @returns {string}
+ */
+const getProjectHint = () => isTouch()
+    ? 'Tap a floating project to open its case study.'
+    : 'Hover a project to preview it. Click to fly into its world.';
+
+/**
+ * Shorter variant used inside a category/sector view.
+ * @returns {string}
+ */
+const getCategoryHint = () => isTouch()
+    ? 'Tap a floating project to explore its case study'
+    : 'Click a floating project to explore its case study';
+
 export default {
     getGameTerm,
-    getStandardTerm
+    getStandardTerm,
+    getProjectHint,
+    getCategoryHint
 };

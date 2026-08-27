@@ -427,7 +427,7 @@ class CaseStudy {
         const returnBtn = document.createElement('button');
         returnBtn.id = 'return-to-universe';
         returnBtn.className = 'case-study-return-btn';
-        returnBtn.textContent = 'â† Return to Universe';
+        returnBtn.textContent = '← Return to Universe';
 
         // --- Scroll indicator ---
         const scrollIndicator = document.createElement('div');
@@ -635,6 +635,8 @@ class CaseStudy {
 
         // Show overlay with fade-in
         this.overlay.style.display = 'flex';
+        // Supplies its own return control; suppress the HUD's touch MAP button.
+        document.body.classList.add('has-overlay-back');
         gsap.fromTo(this.overlay, { opacity: 0 }, { opacity: 1, duration: 0.5 });
 
         // Check if content is scrollable after a short delay
@@ -646,6 +648,7 @@ class CaseStudy {
      */
     hide() {
         if (!this.overlay) return;
+        document.body.classList.remove('has-overlay-back');
         gsap.to(this.overlay, {
             opacity: 0,
             duration: 0.4,

@@ -26,6 +26,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import gameState from '../systems/gameState.js';
 import ambient from './ambient/index.js';
+import { isTouchDevice } from './ambient/capabilities.js';
 
 // ============================================================================
 // STATE VARIABLES
@@ -54,6 +55,9 @@ let modelGroup = null;
 
 /** Current cursor state: 'scanning' | 'target' | 'lock' */
 let currentState = 'scanning';
+
+/** False on touch devices, where the ship has no pointer to follow. */
+let isShipEnabled = true;
 
 // --- Mouse / Target ---
 
@@ -640,18 +644,22 @@ const render = () => {
     const reducedMotion = gameState.getSetting('reducedMotion');
 
     // --- Update ship physics (spring-based cursor) ---
-    if (!reducedMotion) {
-        updateShipPhysics(dt);
-    } else {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        shipX += (targetX - w / 2 - shipX) * 0.5;
-        shipY += (h / 2 - targetY - shipY) * 0.5;
-        velocityX = 0;
-        velocityY = 0;
-    }
+    // Skipped entirely on touch devices: there is no ship and no pointer, and
+    // edge auto-scroll must not fight the user's own finger scrolling.
+    if (isShipEnabled) {
+        if (!reducedMotion) {
+            updateShipPhysics(dt);
+        } else {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            shipX += (targetX - w / 2 - shipX) * 0.5;
+            shipY += (h / 2 - targetY - shipY) * 0.5;
+            velocityX = 0;
+            velocityY = 0;
+        }
 
-    updateEdgeAutoScroll(dt);
+        updateEdgeAutoScroll(dt);
+    }
 
     // --- Position the 3D model ---
     if (modelGroup && modelLoaded) {
@@ -861,52 +869,72 @@ const init = async () => {
     targetX = window.innerWidth / 2;
     targetY = window.innerHeight / 2;
 
-    await loadModel();
+    // On touch devices the ship is a pointer affordance with no pointer to
+    // follow: it would freeze wherever the last synthetic tap landed and sit
+    // on top of the content. Skip the model (and the cursor-hiding CSS, which
+    // would otherwise hide nothing but break nothing either) and run the
+    // ambient scenery only, so the environment still feels alive.
+    const touch = isTouchDevice();
+    isShipEnabled = !touch;
+
+    if (isShipEnabled) {
+        await loadModel();
+    }
 
     // Build the ambient layer inside the same overlay scene.
     ambient.init(scene);
 
     if (canvas) {
         canvas.style.display = 'block';
+        // Without a ship to keep on top, the overlay canvas is pure background
+        // scenery. Drop it below the content overlays (z-index 1000) so
+        // asteroids stop painting over case-study text on touch devices.
+        if (!isShipEnabled) {
+            canvas.style.zIndex = '1';
+        }
     }
     visible = true;
 
-    document.addEventListener('mousemove', (e) => {
-        onMouseMove(e.clientX, e.clientY);
-    }, { passive: true });
+    if (isShipEnabled) {
+        document.addEventListener('mousemove', (e) => {
+            onMouseMove(e.clientX, e.clientY);
+        }, { passive: true });
 
-    document.addEventListener('mousedown', onMouseDown, { passive: true });
-    document.addEventListener('mouseup', onMouseUp, { passive: true });
+        document.addEventListener('mousedown', onMouseDown, { passive: true });
+        document.addEventListener('mouseup', onMouseUp, { passive: true });
 
-    // Releasing outside the window must not leave the ship firing forever.
-    window.addEventListener('blur', onMouseUp);
+        // Releasing outside the window must not leave the ship firing forever.
+        window.addEventListener('blur', onMouseUp);
 
-    document.addEventListener('mouseleave', () => {
-        visible = false;
-        ambient.setFiring(false);
-        if (canvas) canvas.style.display = 'none';
-    });
+        document.addEventListener('mouseleave', () => {
+            visible = false;
+            ambient.setFiring(false);
+            if (canvas) canvas.style.display = 'none';
+        });
 
-    document.addEventListener('mouseenter', () => {
-        visible = true;
-        if (canvas) canvas.style.display = 'block';
-    });
+        document.addEventListener('mouseenter', () => {
+            visible = true;
+            if (canvas) canvas.style.display = 'block';
+        });
+    }
 
     if (!animId) {
         lastFrameTime = 0;
         loop();
     }
 
-    document.documentElement.style.cursor = 'none';
-    const style = document.createElement('style');
-    style.id = 'game-cursor-style';
-    style.textContent = `
-        html { cursor: none; }
-        a, button, input, textarea, select, [role="button"] { cursor: none; }
-    `;
-    document.head.appendChild(style);
+    if (isShipEnabled) {
+        document.documentElement.style.cursor = 'none';
+        const style = document.createElement('style');
+        style.id = 'game-cursor-style';
+        style.textContent = `
+            html { cursor: none; }
+            a, button, input, textarea, select, [role="button"] { cursor: none; }
+        `;
+        document.head.appendChild(style);
+    }
 
-    console.log('[Cursor] 3D spacecraft cursor initialized.');
+    console.log(`[Cursor] Initialized (ship ${isShipEnabled ? 'enabled' : 'disabled — touch device'}).`);
 };
 
 /**

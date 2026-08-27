@@ -27,6 +27,8 @@ let controlsEl = null;
 let explorationEl = null;
 /** @type {HTMLElement|null} */
 let soundToggleEl = null;
+/** @type {HTMLElement|null} */
+let mapButtonEl = null;
 
 /** Current sector name */
 let currentSector = null;
@@ -107,6 +109,20 @@ const build = () => {
         window.dispatchEvent(new CustomEvent('game-audio-toggle', { detail: { enabled: next } }));
     });
     hudEl.appendChild(soundToggleEl);
+
+    // --- MAP button (touch only; CSS hides it on pointer devices) ---
+    // The controls legend tells desktop users to press "M". Touch devices have
+    // no keyboard, so they get a real tap target for the same action.
+    mapButtonEl = document.createElement('button');
+    mapButtonEl.className = 'game-hud-map-btn';
+    mapButtonEl.id = 'game-hud-map-btn';
+    mapButtonEl.type = 'button';
+    mapButtonEl.setAttribute('aria-label', 'Return to universe map');
+    mapButtonEl.textContent = 'MAP';
+    mapButtonEl.addEventListener('click', () => {
+        if (onMapClick) onMapClick();
+    });
+    hudEl.appendChild(mapButtonEl);
 
     document.body.appendChild(hudEl);
 
@@ -299,6 +315,7 @@ const dispose = () => {
     controlsEl = null;
     explorationEl = null;
     soundToggleEl = null;
+    mapButtonEl = null;
     onMapClick = null;
 };
 

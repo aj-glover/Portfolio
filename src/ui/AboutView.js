@@ -390,6 +390,8 @@ class AboutView {
     show() {
         if (!this.overlay) this.build();
         this.overlay.style.display = 'flex';
+        // Supplies its own return control; suppress the HUD's touch MAP button.
+        document.body.classList.add('has-overlay-back');
         gsap.fromTo(this.overlay, { opacity: 0 }, { opacity: 1, duration: 0.5 });
     }
 
@@ -398,6 +400,7 @@ class AboutView {
      */
     hide() {
         if (!this.overlay) return;
+        document.body.classList.remove('has-overlay-back');
         gsap.to(this.overlay, {
             opacity: 0,
             duration: 0.4,

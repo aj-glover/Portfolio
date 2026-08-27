@@ -6,6 +6,7 @@
 
 import { gsap } from 'gsap';
 import { PORTFOLIO, CATEGORIES } from '../data/projectData.js';
+import terminology from '../game/terminology.js';
 
 /**
  * UniverseIntro component - builds and manages the intro/HUD overlay.
@@ -80,7 +81,7 @@ class UniverseIntro {
         // --- Hint + dismiss ---
         const hint = document.createElement('p');
         hint.className = 'universe-intro-hint';
-        hint.textContent = PORTFOLIO.hint;
+        hint.textContent = terminology.getProjectHint();
 
         const dismissBtn = document.createElement('button');
         dismissBtn.className = 'universe-intro-dismiss';

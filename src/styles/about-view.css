@@ -352,3 +352,32 @@
         grid-template-columns: 1fr;
     }
 }
+/* ==========================================================================
+   MOBILE / TOUCH
+   The return control sits at the end of a very long scroll, so on a phone it
+   becomes a fixed bar — the view is escapable without scrolling to the end.
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .about-view {
+        padding: 1.25rem 1rem 6.5rem;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+
+    .about-return-btn {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+        width: calc(100% - 2rem);
+        max-width: 420px;
+        min-height: 48px;
+        margin-top: 0;
+        z-index: 1002;
+        /* Opaque so the article text does not read through the bar. */
+        background: rgba(8, 12, 26, 0.96);
+        border-color: rgba(255, 255, 255, 0.65);
+        box-shadow: 0 -8px 24px rgba(5, 8, 20, 0.9);
+    }
+}

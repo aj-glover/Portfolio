@@ -458,3 +458,111 @@
     0%, 100% { transform: translateY(0); opacity: 0.5; }
     50% { transform: translateY(4px); opacity: 1; }
 }
+
+/* ==========================================================================
+   MOBILE / TOUCH
+   The desktop layout assumes a wide viewport and the ship cursor's edge
+   auto-scroll. Neither holds on a phone, so below 768px the overlay becomes
+   an ordinary, natively scrollable document with touch-sized controls.
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .case-study-overlay {
+        padding: 1rem 1rem 6.5rem;
+        /* Momentum scrolling; the ship's edge auto-scroll does not run here. */
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+
+    /* Restore a real scrollbar affordance: the thematic indicator is hidden
+       on touch (see below), so nothing else signals scrollability. */
+    .case-study-overlay {
+        scrollbar-width: thin;
+        -ms-overflow-style: auto;
+    }
+
+    .case-study-overlay::-webkit-scrollbar {
+        display: block;
+        width: 3px;
+    }
+
+    .case-study-overlay::-webkit-scrollbar-thumb {
+        background: rgba(102, 204, 255, 0.4);
+        border-radius: 2px;
+    }
+
+    /* space-between + wide tracking wraps into a ragged block at 390px. */
+    .case-study-game-header {
+        font-size: 0.6rem;
+        letter-spacing: 0.06em;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        margin-bottom: 0.75rem;
+    }
+
+    .case-study-hero-img {
+        max-height: 32vh;
+    }
+
+    .case-study-title {
+        font-size: 1.6rem;
+    }
+
+    .case-study-category,
+    .case-study-mission-type {
+        font-size: 0.95rem;
+    }
+
+    .case-study-section h2 {
+        font-size: 1.15rem;
+    }
+
+    .case-study-section p {
+        font-size: 0.95rem;
+    }
+
+    /* Multi-column grids collapse — 250px minimums overflow a 390px screen. */
+    .case-study-gallery,
+    .case-study-before-after,
+    .case-study-card-grid,
+    .case-study-workflow {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    /* KPI tiles stay two-up: they are short and read well side by side. */
+    .case-study-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .case-study-kpi-value {
+        font-size: 1.5rem;
+    }
+
+    /* The scroll indicator is a pointer affordance and overlaps content. */
+    .case-study-scroll-indicator {
+        display: none;
+    }
+
+    /* Return button becomes a full-width, thumb-reachable fixed bar so it is
+       always accessible without scrolling to the end of a long case study. */
+    .case-study-return-btn {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+        width: calc(100% - 2rem);
+        max-width: 420px;
+        min-height: 48px;
+        margin-top: 0;
+        font-size: 1rem;
+        z-index: 1002;
+        /* Opaque: it floats over the article text, which would otherwise
+           read straight through the transparent desktop styling. */
+        background: rgba(8, 12, 26, 0.96);
+        border-color: rgba(255, 255, 255, 0.65);
+        box-shadow: 0 -8px 24px rgba(5, 8, 20, 0.9);
+    }
+}

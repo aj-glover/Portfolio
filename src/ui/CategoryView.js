@@ -6,6 +6,7 @@
 
 import { gsap } from 'gsap';
 import { CATEGORIES } from '../data/projectData.js';
+import terminology from '../game/terminology.js';
 
 class CategoryView {
     constructor() {
@@ -43,7 +44,7 @@ class CategoryView {
         const hint = document.createElement('p');
         hint.className = 'category-view-hint';
         hint.id = 'category-view-hint';
-        hint.textContent = 'Click a floating project to explore its case study';
+        hint.textContent = terminology.getCategoryHint();
 
         // Back button
         const backBtn = document.createElement('button');
@@ -94,6 +95,9 @@ class CategoryView {
         this.overlay.style.setProperty('--category-accent', colorHex);
 
         this.overlay.style.display = 'flex';
+        // This view supplies its own "Back to Universe" control, so the HUD's
+        // touch MAP button would duplicate it and overlap it on small screens.
+        document.body.classList.add('has-overlay-back');
         gsap.fromTo(this.overlay, { opacity: 0 }, { opacity: 1, duration: 0.5 });
     }
 
@@ -102,6 +106,7 @@ class CategoryView {
      */
     hide() {
         if (!this.overlay) return;
+        document.body.classList.remove('has-overlay-back');
         gsap.to(this.overlay, {
             opacity: 0,
             duration: 0.4,

@@ -923,3 +923,94 @@
     white-space: nowrap;
     border: 0;
 }
+/* ==========================================================================
+   TOUCH DEVICES
+   The HUD was composed for a wide screen with four free corners. On a phone
+   the bottom corners collide with the overlay's own controls ("Back to
+   Universe", the case-study return bar), so the decorative readouts step
+   aside and the one real control (MAP) becomes a proper tap target.
+   ========================================================================== */
+
+/* The MAP button only exists for touch layouts (re-shown below). */
+.game-hud-map-btn {
+    display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    /* The controls legend is a keyboard/mouse key map — it lists MOVE MOUSE
+       and MAP M, neither of which exists on touch. The MAP button below
+       replaces it. */
+    .game-hud-controls {
+        display: none;
+    }
+
+    /* Keep the bottom readouts clear of the home indicator and of the
+       full-width action buttons the overlays place along the bottom edge. */
+    .game-hud-location,
+    .game-hud-exploration {
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* When an overlay owns the bottom bar, lift the readouts above it so the
+       button never prints over SECTOR / EXPLORATION. */
+    body.has-overlay-back .game-hud-location,
+    body.has-overlay-back .game-hud-exploration {
+        bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Exploration sits bottom-centre where overlay buttons live; move it up
+       beside the identity block instead of stacking on top of them. */
+    .game-hud-exploration {
+        left: auto;
+        right: 12px;
+        transform: none;
+        align-items: flex-end;
+    }
+
+    .game-hud-identity,
+    .game-hud-sector {
+        top: calc(12px + env(safe-area-inset-top, 0px));
+    }
+
+    /* Tappable MAP control, replacing the "MAP  M" keyboard hint. Anchored
+       bottom-left, clear of the identity block at the top and of the
+       full-width action buttons that overlays centre along the bottom. */
+    .game-hud-map-btn {
+        position: absolute;
+        bottom: calc(52px + env(safe-area-inset-bottom, 0px));
+        left: 12px;
+        min-height: 44px;
+        min-width: 72px;
+        padding: 8px 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(10, 16, 32, 0.75);
+        border: 1px solid rgba(102, 204, 255, 0.45);
+        border-radius: 6px;
+        color: #66ccff;
+        font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        pointer-events: auto;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Views that render their own "Back to Universe" / "Return" control make
+       the MAP button redundant — and on a phone the two would overlap. */
+    body.has-overlay-back .game-hud-map-btn {
+        display: none;
+    }
+
+    .game-hud-sound-toggle {
+        min-height: 40px;
+        min-width: 88px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9px;
+        top: calc(58px + env(safe-area-inset-top, 0px));
+    }
+}

@@ -106,3 +106,42 @@
         display: none;
     }
 }
+/* ==========================================================================
+   MOBILE / TOUCH
+   The header bar and the HUD both claim the top of the screen, and the back
+   button lands on the exploration readout. Give each its own band.
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    /* Push the header below the HUD identity/sector rows so the sector title
+       no longer prints on top of "AJ GLOVER" / "SECTOR 02". */
+    .category-view-content {
+        margin-top: calc(58px + env(safe-area-inset-top, 0px));
+        max-height: none;
+        padding: 0.5rem 0.75rem;
+        gap: 0.15rem;
+    }
+
+    .category-view-title {
+        font-size: 1.15rem;
+    }
+
+    .category-view-description {
+        font-size: 0.7rem;
+        max-width: 100%;
+    }
+
+    .category-view-hint {
+        font-size: 0.65rem;
+        max-width: 100%;
+    }
+
+    /* Full-width, thumb-reachable back control clear of the home indicator. */
+    .category-view-back {
+        bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+        width: calc(100% - 1.5rem);
+        max-width: 420px;
+        min-height: 48px;
+        font-size: 0.95rem;
+    }
+}
